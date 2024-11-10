@@ -1,8 +1,5 @@
 (defn add [a b] (+ a b))
 
-(defn- add_child [node]
-  (.appendChild (.querySelector document "#log") node))
-
 (defn- add_nodes [& nodes]
   (let [root (.querySelector document "#log")]
     (.forEach (.querySelectorAll root "button") (fn [n] (set! (.-disabled n) true)))
@@ -30,17 +27,18 @@
 (def hello_ref (atom null))
 
 (defn back_home []
-  (button "На главную" (fn [] ((deref hello_ref)))))
+  (button "В меню" (fn [] ((deref hello_ref)))))
 
 (defn- decode_qr [target]
   (let [file (first (.-files target))
         barcodeDetector (BarcodeDetector. {:formats [:qr_code]})]
+    (add_nodes (view "Пожалуйста, подождите..."))
     (->
      (createImageBitmap file)
      (.then (fn [bitmap] (.detect barcodeDetector bitmap)))
      (.then (fn [barcodes]
               (add_nodes
-               (view (JSON.stringify barcodes))
+               (view (JSON.stringify barcodes null 2))
                (back_home))))
      (.catch (fn [e] (view e))))))
 
