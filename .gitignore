@@ -7,3 +7,5 @@ build/
 /.github/android/app/src/main/assets/domain.js
 /.github/android/app/src/main/assets/index.html
 /.github/android/app/src/main/java/
+*.generated.*
+*.gen.*

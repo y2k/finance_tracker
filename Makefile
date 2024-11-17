@@ -24,22 +24,30 @@ clean:
 
 .PHONY: build_java
 build_java: build
-	@ set -e; find $(ANDROID_SRC_DIRS) -name '*.clj' | while read clj_file; do \
-		out_file=$(ANDROID_OUT_DIR)/$$(echo $$clj_file | sed 's|\.clj$$|.java|'); \
-		mkdir -p $$(dirname $$out_file); \
-		clj2js java $$clj_file $(ANDROID_PRELUDE_PATH) > $$out_file; \
-	  done
+	@ .github/build.gen.sh
+	@ .github/build-interpreter.gen.sh
+	@ cp vendor/prelude/java/src/RT.java ${OUT_DIR}/android/y2k/RT.java
+# @ cp vendor/prelude/java/src/RT.java .github/android/app/src/main/java/y2k
+	@ rm -rf .github/android/app/src/main/java
+	@ cp -r ${OUT_DIR}/android .github/android/app/src/main/java
 	@ node .github/bin/src/build/build.js manifest
-	@ cp vendor/prelude/java/src/RT.java .github/android/app/src/main/java/y2k
 
 .PHONY: install_apk
 install_apk: build_java
 	@ docker run --rm -v ${PWD}/.github/temp/android:/root/.android -v ${PWD}/.github/temp/gradle:/root/.gradle -v ${PWD}/.github/android:/target y2khub/cljdroid build
 	@ adb install -r .github/android/app/build/outputs/apk/debug/app-debug.apk
 
+.PHONY: docker_extract
 docker_extract:
 	@ rm -rf .github/android && docker run --rm -v ${PWD}/.github/android:/target y2khub/cljdroid copy
 
 .PHONY: reload
 reload: build
 	@ node .github/bin/src/build/build.js reload
+
+.PHONE: gen_build
+gen_build:
+	@ clj2js make_build_script $$PWD/vendor/packages/interpreter/java/0.1.0 $$PWD/.github/bin/android/interpreter > .github/build-interpreter.gen.sh
+	@ chmod +x .github/build-interpreter.gen.sh
+	@ clj2js make_build_script $$PWD/android $$PWD/.github/bin/android/y2k/finance_tracker/android > .github/build.gen.sh
+	@ chmod +x .github/build.gen.sh

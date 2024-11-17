@@ -67,5 +67,5 @@
   (let [[^Activity activity ^WebView wv] self.state]
     (.runOnUiThread
      activity
-     (fn! [] (handle_event wv event payload)))
+     (runnable (fn! [] (handle_event wv event payload))))
     unit))
