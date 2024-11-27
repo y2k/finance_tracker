@@ -13,4 +13,9 @@
     [:div {:class "root" :style "display: flex; flex-direction: row-reverse; gap: 16px; row-gap: 0px; flex-wrap: wrap"}]]
 
    [:template {:id "input_template"}
-    [:input {:type "file" :accept "image/*" :class "input"}]]])
+    [:input {:type "file" :accept "image/*" :class "input"}]]
+
+   [:span {:id :output}]
+
+  ;;  [:button {:class "title" :style "width: auto;"} "Test"]
+   ])

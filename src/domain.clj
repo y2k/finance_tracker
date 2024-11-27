@@ -54,7 +54,10 @@
 (defn- hello []
   (add_nodes
    (view "Команды")
-   (group ["QR" (fn [] (add_nodes (input)))] ["Настроить нотификации" (fn [] (hello))])))
+   (group
+    ["Test" (fn [] (.dispatch Android :notification ""))]
+    ["QR" (fn [] (add_nodes (input)))]
+    ["Настроить нотификации" (fn [] (hello))])))
 
 (defn main []
   (reset! hello_ref hello)

@@ -3,7 +3,8 @@
            [android.content Intent]
            [android.net Uri]
            [android.os Bundle]
-           [android.webkit WebView WebChromeClient ValueCallback JavascriptInterface]))
+           [android.webkit WebView WebChromeClient ValueCallback JavascriptInterface]
+           [interpreter Interpreter]))
 
 (gen-class
  :name MainActivity
@@ -24,8 +25,8 @@
     (.setAllowUniversalAccessFromFileURLs webSettings true)
     (.addJavascriptInterface webview (WebViewJsListener. self webview) "Android")
     (.setWebChromeClient webview (WebChromeClientImpl.))
-    ;; (.loadUrl webview "file:///android_asset/index.html")
-    (.loadUrl webview (str "file://" (.getFilesDir self) "/index.html"))
+    (.loadUrl webview "file:///android_asset/index.html")
+    ;; (.loadUrl webview (str "file://" (.getFilesDir self) "/index.html"))
     unit))
 
 (def- filePathCallbackRef (atom null))
@@ -58,10 +59,15 @@
  :prefix "wv_"
  :methods [[^JavascriptInterface dispatch [String String] void]])
 
+(defn update_ui [^WebView wv query text]
+  (.evaluateJavascript wv (str "window.update_ui('" query "', '" text "')") null)
+  unit)
+
 (defn- handle_event [^WebView wv event payload]
-  (case event
-    ;; :reload (do (.reload wv) unit)
-    (println "FIXME: " event " | " payload)))
+  (update_ui wv "#output"
+             (->
+              (Interpreter/make_env)
+              (Interpreter/eval (list "+" 2 2)))))
 
 (defn- wv_dispatch [^WebViewJsListener self event payload]
   (let [[^Activity activity ^WebView wv] self.state]

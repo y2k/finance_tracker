@@ -27,7 +27,6 @@ build_java: build
 	@ .github/build.gen.sh
 	@ .github/build-interpreter.gen.sh
 	@ cp vendor/prelude/java/src/RT.java ${OUT_DIR}/android/y2k/RT.java
-# @ cp vendor/prelude/java/src/RT.java .github/android/app/src/main/java/y2k
 	@ rm -rf .github/android/app/src/main/java
 	@ cp -r ${OUT_DIR}/android .github/android/app/src/main/java
 	@ node .github/bin/src/build/build.js manifest
@@ -36,9 +35,10 @@ build_java: build
 install_apk: build_java
 	@ docker run --rm -v ${PWD}/.github/temp/android:/root/.android -v ${PWD}/.github/temp/gradle:/root/.gradle -v ${PWD}/.github/android:/target y2khub/cljdroid build
 	@ adb install -r .github/android/app/build/outputs/apk/debug/app-debug.apk
+	@ adb shell am start -S -n 'y2k.finance_tracker/.android.Main\$$MainActivity'
 
-.PHONY: docker_extract
-docker_extract:
+.PHONY: docker_build_init
+docker_build_init:
 	@ rm -rf .github/android && docker run --rm -v ${PWD}/.github/android:/target y2khub/cljdroid copy
 
 .PHONY: reload

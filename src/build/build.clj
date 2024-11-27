@@ -3,14 +3,6 @@
                 ["../../vendor/packages/xml/0.1.0/main" :as tools]
                 ["../view" :as app]))
 
-;;     <service
-;;     android:name=".MyNotificationListenerService"
-;;     android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
-;;     <intent-filter>
-;;         <action android:name="android.service.notification.NotificationListenerService" />
-;;     </intent-filter>
-;; </service>
-
 (defn- manifest []
   [:manifest {:xmlns:android "http://schemas.android.com/apk/res/android"}
    [:uses-permission {:android:name "android.permission.READ_EXTERNAL_STORAGE"}]
