@@ -3,6 +3,7 @@
            [android.content Intent]
            [android.net Uri]
            [android.os Bundle]
+           [java.nio.file Files]
            [android.webkit WebView WebChromeClient ValueCallback JavascriptInterface]
            [interpreter Interpreter]))
 
@@ -64,10 +65,19 @@
   unit)
 
 (defn- handle_event [^WebView wv event payload]
-  (update_ui wv "#output"
-             (->
-              (Interpreter/make_env)
-              (Interpreter/eval (list "+" 2 2)))))
+  (let [env (->
+             (Interpreter/make_env)
+             (Interpreter/eval
+              (checked!
+               (Files/readAllLines
+                (.toPath
+                 (.getFileStreamPath (.getContext wv) "user.txt")))))
+             second)]
+    (update_ui wv "#output"
+               (->
+                env
+                (Interpreter/eval ["(" "user/main" ")"])
+                first))))
 
 (defn- wv_dispatch [^WebViewJsListener self event payload]
   (let [[^Activity activity ^WebView wv] self.state]

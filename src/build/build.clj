@@ -46,17 +46,20 @@
   (Promise. (fn [resolve reject]
               (cp/exec cmd (fn [e] (if (some? e) (reject e) (resolve)))))))
 
-(case (get process.argv 2)
-  :reload
+(defn- reload []
   (-> (write_html)
+      (.then (fn [] (exec_async (str "clj2js bytecode shared/user.clj /Users/igor/Projects/finance_tracker/vendor/prelude/interpreter/src/prelude.clj > .github/temp/user.txt"))))
+      (.then (fn [] (exec_async (str "adb push .github/temp/user.txt /data/data/y2k.finance_tracker/files/user.txt"))))
+      ;;
       (.then (fn [] (exec_async (str "adb push " HTML_PATH " /data/data/y2k.finance_tracker/files/index.html"))))
       (.then (fn [] (exec_async (str "adb push " PATH_JS " /data/data/y2k.finance_tracker/files/domain.js"))))
-      (.then (fn [] (exec_async "adb shell am start -S -n 'y2k.finance_tracker/.android.Main\\$MainActivity'"))))
+      (.then (fn [] (exec_async "adb shell am start -S -n 'y2k.finance_tracker/.android.Main\\$MainActivity'")))))
 
-  :manifest
-  (Promise.all
-   [(write_html)
-    (fs/writeFile ".github/android/app/src/main/AndroidManifest.xml"
-                  (tools/to_string (manifest))
-                  "utf-8")])
+(case (get process.argv 2)
+  :reload (reload)
+  :manifest (Promise.all
+             [(write_html)
+              (fs/writeFile ".github/android/app/src/main/AndroidManifest.xml"
+                            (tools/to_string (manifest))
+                            "utf-8")])
   null)
