@@ -60,24 +60,35 @@
  :prefix "wv_"
  :methods [[^JavascriptInterface dispatch [String String] void]])
 
-(defn update_ui [^WebView wv query text]
-  (.evaluateJavascript wv (str "window.update_ui('" query "', '" text "')") null)
-  unit)
+;; (defn update_ui [^WebView wv query text]
+;;   (.evaluateJavascript wv (str "window.update_ui('" query "', `" text "`)") null)
+;;   unit)
+
+(defn- make_default_state []
+  (atom (Interpreter/make_env
+         {:vector (function (fn [xs] xs))
+          :atom (function (fn [[x]] (atom x)))
+          :deref (function (fn [[x]] (deref x)))
+          :reset! (function (fn [[a x]] (reset! a x) x))
+          :str (function (fn [xs] (str (into-array2 (.-class Object) xs))))})))
+
+(def env_atom (make_default_state))
 
 (defn- handle_event [^WebView wv event payload]
   (let [env (->
-             (Interpreter/make_env)
+             (deref env_atom)
              (Interpreter/eval
               (checked!
                (Files/readAllLines
                 (.toPath
                  (.getFileStreamPath (.getContext wv) "user.txt")))))
              second)]
-    (update_ui wv "#output"
-               (->
-                env
-                (Interpreter/eval ["(" "user/main" ")"])
-                first))))
+    (reset! env_atom env)
+    (.evaluateJavascript
+     wv
+     (-> env (Interpreter/eval ["(" "user/main" ")"]) first str)
+     null)
+    null))
 
 (defn- wv_dispatch [^WebViewJsListener self event payload]
   (let [[^Activity activity ^WebView wv] self.state]

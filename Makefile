@@ -17,6 +17,7 @@ build:
 		clj2js js $$clj_file $(PRELUDE_PATH) > $$out_file; \
 	  done
 	@ cp .github/bin/src/domain.js .github/android/app/src/main/assets/
+	@ node .github/bin/src/build/build.js manifest
 
 .PHONY: clean
 clean:
@@ -29,11 +30,13 @@ build_java: build
 	@ cp vendor/prelude/java/src/RT.java ${OUT_DIR}/android/y2k/RT.java
 	@ rm -rf .github/android/app/src/main/java
 	@ cp -r ${OUT_DIR}/android .github/android/app/src/main/java
-	@ node .github/bin/src/build/build.js manifest
 
 .PHONY: install_apk
 install_apk: build_java
+	@ echo "" >> .github/temp/build_duration.txt
+	@ date +%s >> .github/temp/build_duration.txt
 	@ docker run --rm -v ${PWD}/.github/temp/android:/root/.android -v ${PWD}/.github/temp/gradle:/root/.gradle -v ${PWD}/.github/android:/target y2khub/cljdroid build
+	@ date +%s >> .github/temp/build_duration.txt
 	@ adb install -r .github/android/app/build/outputs/apk/debug/app-debug.apk
 	@ adb shell am start -S -n 'y2k.finance_tracker/.android.Main\$$MainActivity'
 

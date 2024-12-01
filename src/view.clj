@@ -15,6 +15,9 @@
    [:template {:id "input_template"}
     [:input {:type "file" :accept "image/*" :class "input"}]]
 
+   [:style {}
+    ".short_button {width: auto;}"]
+
    [:span {:id :output}]
 
   ;;  [:button {:class "title" :style "width: auto;"} "Test"]

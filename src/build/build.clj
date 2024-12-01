@@ -34,7 +34,7 @@
    [:body {:style "user-select: none; height: 100%; display: flex; flex-direction: column-reverse;"}
     (app/html)
     [:script {:type :module} "import { main } from './domain.js'; main()"]
-    [:script {:type :module} "window.update_ui=(query,text)=>{document.querySelector(query).innerHTML=text}"]]])
+    [:script {:type :module} "window.update_ui=(query,text)=>{document.querySelector(query).insertAdjacentHTML('beforeend', text);}"]]])
 
 (def HTML_PATH ".github/android/app/src/main/assets/index.html")
 (def PATH_JS ".github/bin/src/domain.js")
