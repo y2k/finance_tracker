@@ -48,12 +48,15 @@
 
 (defn- reload []
   (-> (write_html)
-      (.then (fn [] (exec_async (str "clj2js bytecode shared/user.clj /Users/igor/Projects/finance_tracker/vendor/prelude/interpreter/src/prelude.clj > .github/temp/user.txt"))))
-      (.then (fn [] (exec_async (str "adb push .github/temp/user.txt /data/data/y2k.finance_tracker/files/user.txt"))))
+      (.then (fn [] (exec_async (str "clj2js bytecode shared/user.clj /Users/igor/Projects/finance_tracker/vendor/prelude/bytecode/prelude.clj > .github/temp/user.txt"))))
+      (.then (fn [] (exec_async (str "adb push .github/temp/user.txt /data/data/y2k.finance_tracker/files/user.txt.tmp"))))
+      (.then (fn [] (exec_async (str "adb shell cp /data/data/y2k.finance_tracker/files/user.txt.tmp /data/data/y2k.finance_tracker/files/user.txt"))))
       ;;
       (.then (fn [] (exec_async (str "adb push " HTML_PATH " /data/data/y2k.finance_tracker/files/index.html"))))
       (.then (fn [] (exec_async (str "adb push " PATH_JS " /data/data/y2k.finance_tracker/files/domain.js"))))
-      (.then (fn [] (exec_async "adb shell am start -S -n 'y2k.finance_tracker/.android.Main\\$MainActivity'")))))
+      (.then (fn [] (exec_async "adb shell am start -n 'y2k.finance_tracker/.android.Main\\$MainActivity'")))
+      ;; (.then (fn [] (exec_async "adb shell am start -S -n 'y2k.finance_tracker/.android.Main\\$MainActivity'")))
+      ))
 
 (case (get process.argv 2)
   :reload (reload)

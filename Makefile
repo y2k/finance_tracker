@@ -46,6 +46,7 @@ docker_build_init:
 
 .PHONY: reload
 reload: build
+	@ adb root
 	@ node .github/bin/src/build/build.js reload
 
 .PHONE: gen_build
