@@ -60,17 +60,8 @@
  :prefix "wv_"
  :methods [[^JavascriptInterface dispatch [String String] void]])
 
-;; (defn update_ui [^WebView wv query text]
-;;   (.evaluateJavascript wv (str "window.update_ui('" query "', `" text "`)") null)
-;;   unit)
-
 (defn- make_default_state []
-  (atom (Interpreter/make_env
-         {:vector (function (fn [xs] xs))
-          :atom (function (fn [[x]] (atom x)))
-          :deref (function (fn [[x]] (deref x)))
-          :reset! (function (fn [[a x]] (reset! a x) x))
-          :str (function (fn [xs] (str (into-array2 (.-class Object) xs))))})))
+  (atom (Interpreter/make_env {})))
 
 (def env_atom (make_default_state))
 
@@ -86,7 +77,11 @@
     (reset! env_atom env)
     (.evaluateJavascript
      wv
-     (-> env (Interpreter/eval ["(" "user/main" ")"]) first str)
+     (->
+      env :scope (get "user/main")
+      (as java.util.function.Function)
+      (.apply [{:event event :payload payload}])
+      str)
      null)
     null))
 

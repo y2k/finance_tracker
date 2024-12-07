@@ -6,7 +6,7 @@ ANDROID_SRC_DIRS := android
 ANDROID_OUT_DIR := .github/android/app/src/main/java/y2k/finance_tracker
 
 .PHONY: test
-test: build
+test: build build_java
 	@ node $(OUT_DIR)/test/test.js
 
 .PHONY: build
@@ -27,18 +27,20 @@ clean:
 build_java: build
 	@ .github/build.gen.sh
 	@ .github/build-interpreter.gen.sh
-	@ cp vendor/prelude/java/src/RT.java ${OUT_DIR}/android/y2k/RT.java
+	cp $(shell dirname $(ANDROID_PRELUDE_PATH))/RT.java ${OUT_DIR}/android/y2k/RT.java
 	@ rm -rf .github/android/app/src/main/java
 	@ cp -r ${OUT_DIR}/android .github/android/app/src/main/java
 
 .PHONY: install_apk
-install_apk: build_java
+install_apk: pre_install_apk reload
+
+.PHONY: pre_install_apk
+pre_install_apk: build_java
 	@ echo "" >> .github/temp/build_duration.txt
 	@ date +%s >> .github/temp/build_duration.txt
 	@ docker run --rm -v ${PWD}/.github/temp/android:/root/.android -v ${PWD}/.github/temp/gradle:/root/.gradle -v ${PWD}/.github/android:/target y2khub/cljdroid build
 	@ date +%s >> .github/temp/build_duration.txt
 	@ adb install -r .github/android/app/build/outputs/apk/debug/app-debug.apk
-	@ adb shell am start -S -n 'y2k.finance_tracker/.android.Main\$$MainActivity'
 
 .PHONY: docker_build_init
 docker_build_init:
