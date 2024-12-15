@@ -1,15 +1,30 @@
-(ns y2k.finance_tracker.android
-  (:import [java.io BufferedOutputStream BufferedReader InputStreamReader OutputStream]
-           [java.net ServerSocket Socket]
-           [java.lang Thread]))
+(ns _ (:import [java.io BufferedOutputStream BufferedReader InputStreamReader OutputStream]
+               [java.net ServerSocket Socket]
+               [android.content Context]
+               [java.lang Thread]))
 
 (def code_atom (atom ""))
+
+;; (defn get_code [] (.split (as (deref code_atom) "String") "\n"))
+(defn get_code []
+  (->
+   (deref code_atom)
+   (as String)
+   (.split "\n")
+   vec))
 
 (defn- read_all [^BufferedReader reader]
   (let [line (checked! (.readLine reader))]
     (if (nil? line)
       ""
       (str line "\n" (read_all reader)))))
+
+(defn load_init [^Context context]
+  (let [input (-> (.getAssets context) (.open "shared/user.bytecode") checked!)
+        result (-> input InputStreamReader. BufferedReader. read_all checked!)]
+    (checked! (do (.close input) unit))
+    (reset! code_atom result)
+    unit))
 
 (defn start []
   (let [stop_atom (atom false)

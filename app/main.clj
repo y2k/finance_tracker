@@ -1,11 +1,11 @@
-(ns y2k.finance_tracker.android
-  (:import [android.app Activity]
-           [android.content Intent]
-           [android.net Uri]
-           [android.os Bundle]
-           [java.nio.file Files]
-           [android.webkit WebView WebChromeClient ValueCallback JavascriptInterface]
-           [interpreter Interpreter]))
+(ns _ (:import [android.app Activity]
+               [android.content Intent]
+               [android.net Uri]
+               [android.os Bundle]
+               [android.webkit WebView WebChromeClient ValueCallback JavascriptInterface]
+               [java.util.function Function])
+    (:require ["../interpreter/interpreter" :as i]
+              ["./repl_server" :as repl]))
 
 (gen-class
  :name MainActivity
@@ -13,9 +13,23 @@
  :constructors {[] []}
  :prefix "activity_"
  :methods [[^Override onCreate [Bundle] void]
-           [^Override onActivityResult [int int Intent] void]])
+           [^Override onActivityResult [int int Intent] void]
+           [^Override onStart [] void]
+           [^Override onStop [] void]])
+
+(def server_atom (atom nil))
+
+(defn activity_onStart [self]
+  (reset! server_atom (repl/start))
+  unit)
+
+(defn activity_onStop [self]
+  (.run ^Runnable (deref server_atom))
+  (reset! server_atom nil)
+  unit)
 
 (defn activity_onCreate [^MainActivity self ^Bundle bundle]
+  (repl/load_init self)
   (let [webview (WebView. self)
         webSettings (.getSettings webview)]
     (.setContentView self webview)
@@ -61,25 +75,27 @@
  :methods [[^JavascriptInterface dispatch [String String] void]])
 
 (defn- make_default_state []
-  (atom (Interpreter/make_env {})))
+  (atom (i/make_env {})))
 
 (def env_atom (make_default_state))
 
 (defn- handle_event [^WebView wv event payload]
   (let [env (->
              (deref env_atom)
-             (Interpreter/eval
-              (checked!
-               (Files/readAllLines
-                (.toPath
-                 (.getFileStreamPath (.getContext wv) "user.txt")))))
+             (i/eval
+              (repl/get_code)
+              ;; (checked!
+              ;;  (Files/readAllLines
+              ;;   (.toPath
+              ;;    (.getFileStreamPath (.getContext wv) "user.txt"))))
+              )
              second)]
     (reset! env_atom env)
     (.evaluateJavascript
      wv
      (->
       env :scope (get "user/main")
-      (as java.util.function.Function)
+      (as Function)
       (.apply [{:event event :payload payload}])
       str)
      null)

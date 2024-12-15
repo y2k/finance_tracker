@@ -22,4 +22,4 @@
                      (label "Пожалуйста, подождите...")
                      (str "WebView.decode_qr({id:'" payload "', next:'qr_recognized'});"))
     "qr_recognized" (label (str "Результат: " payload))
-    (FIXME event)))
+    null))

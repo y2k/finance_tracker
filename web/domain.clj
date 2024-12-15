@@ -8,8 +8,8 @@
      (createImageBitmap file)
      (.then (fn [bitmap] (.detect barcodeDetector bitmap)))
      (.then (fn [barcodes]
-              (.dispatch Android next (JSON.stringify barcodes null 2)))))))
+              (.dispatch window.Android next (JSON.stringify barcodes null 2)))))))
 
 (defn main []
   (set! (.-WebView window) {:decode_qr decode_qr})
-  (.dispatch Android :init ""))
+  (.dispatch window.Android :init ""))

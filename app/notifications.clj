@@ -1,6 +1,5 @@
-(ns y2k.finance_tracker.android
-  (:import [android.service.notification NotificationListenerService StatusBarNotification]
-           [android.content Context]))
+(ns _ (:import [android.service.notification NotificationListenerService StatusBarNotification]
+               [android.content Context]))
 
 ;; NotificationListenerService
 
