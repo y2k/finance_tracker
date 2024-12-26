@@ -10,10 +10,12 @@ build: gen_build
 	@ PRELUDE_JAVA=$(ANDROID_PRELUDE_PATH) \
 		PRELUDE_JS=$(PRELUDE_PATH) \
 		PRELUDE_BYTECODE=vendor/prelude/bytecode/prelude.clj \
+		PRELUDE_REPL=vendor/prelude/interpreter/prelude.clj \
 		.github/build.gen.sh
 	@ mkdir -p .github/android/app/src/main/java/y2k \
 		&& cp $(shell dirname $(ANDROID_PRELUDE_PATH))/RT.java .github/android/app/src/main/java/y2k/RT.java
-	@ node .github/bin/build/build/build.js resources
+	@ cp $(OUT_DIR)/res/res/manifest.repl .github/android/app/src/main/AndroidManifest.xml
+	@ cp $(OUT_DIR)/res/res/html.repl .github/android/app/src/main/assets/index.html
 
 .PHONE: gen_build
 gen_build:
@@ -24,15 +26,15 @@ gen_build:
 		-target .github/android/app/src/main/java \
 		> .github/build.gen.sh
 	@ export OCAMLRUNPARAM=b && clj2js make_build_script \
-		-lang js \
-		-path web \
-		-target .github/android/app/src/main/assets \
+		-lang repl \
+		-path res \
+		-lib vendor/packages/xml/0.2.0 \
+		-target .github/bin/res \
 		>> .github/build.gen.sh
 	@ export OCAMLRUNPARAM=b && clj2js make_build_script \
 		-lang js \
-		-path build \
-		-lib vendor/packages/xml/js/0.1.0 \
-		-target .github/bin/build \
+		-path web \
+		-target .github/android/app/src/main/assets \
 		>> .github/build.gen.sh
 	@ export OCAMLRUNPARAM=b && clj2js make_build_script \
 		-lang js \

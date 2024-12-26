@@ -5,7 +5,8 @@
                [android.webkit WebView WebChromeClient ValueCallback JavascriptInterface]
                [java.util.function Function])
     (:require ["../interpreter/interpreter" :as i]
-              ["./repl_server" :as repl]))
+              ["./repl_server" :as repl]
+              ["./event_store" :as es]))
 
 (gen-class
  :name MainActivity
