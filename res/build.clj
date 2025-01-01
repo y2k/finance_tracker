@@ -12,10 +12,14 @@
   {:target "js"
    :rules [{:src "web/domain.clj"
             :target ".github/android/app/src/main/assets/domain.js"}]})
+ (b/build-files
+  {:target "java"
+   :root-ns "interpreter"
+   :rules [{:src "vendor/packages/interpreter/java/0.1.0/interpreter.clj"
+            :target ".github/android/app/src/main/java/interpreter/interpreter.java"}]})
  (b/build-java-package
   {:root-ns "app"
    :target-dir ".github/android/app/src/main/java"
    :items ["main"
            "notifications"
-           "signal"
-           "repl_server"]}))
+           "repl_service"]}))

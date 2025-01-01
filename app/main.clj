@@ -5,7 +5,7 @@
                [android.webkit WebView WebChromeClient ValueCallback JavascriptInterface]
                [java.util.function Function])
     (:require ["../interpreter/interpreter" :as i]
-              ["./repl_server" :as repl]
+              ["./repl_service" :as repl]
               ["./event_store" :as es]))
 
 (gen-class
@@ -15,22 +15,14 @@
  :prefix "activity_"
  :methods [[^Override onCreate [Bundle] void]
            [^Override onActivityResult [int int Intent] void]
-           [^Override onStart [] void]
-           [^Override onStop [] void]])
+           [^Override onNewIntent [Intent] void]])
 
-(def server_atom (atom nil))
-
-(defn activity_onStart [self]
-  (reset! server_atom (repl/start))
-  unit)
-
-(defn activity_onStop [self]
-  (.run ^Runnable (deref server_atom))
-  (reset! server_atom nil)
-  unit)
+(defn ^void activity_onNewIntent [^MainActivity self ^Intent intent]
+  (repl/update intent))
 
 (defn activity_onCreate [^MainActivity self ^Bundle bundle]
-  (repl/load_init self)
+  (repl/update (.getIntent self))
+
   (let [webview (WebView. self)
         webSettings (.getSettings webview)]
     (.setContentView self webview)
@@ -42,7 +34,6 @@
     (.addJavascriptInterface webview (WebViewJsListener. self webview) "Android")
     (.setWebChromeClient webview (WebChromeClientImpl.))
     (.loadUrl webview "file:///android_asset/index.html")
-    ;; (.loadUrl webview (str "file://" (.getFilesDir self) "/index.html"))
     unit))
 
 (def- filePathCallbackRef (atom null))
@@ -83,13 +74,7 @@
 (defn- handle_event [^WebView wv event payload]
   (let [env (->
              (deref env_atom)
-             (i/eval
-              (repl/get_code)
-              ;; (checked!
-              ;;  (Files/readAllLines
-              ;;   (.toPath
-              ;;    (.getFileStreamPath (.getContext wv) "user.txt"))))
-              )
+             (i/eval (repl/get_code))
              second)]
     (reset! env_atom env)
     (.evaluateJavascript
@@ -99,8 +84,8 @@
       (as Function)
       (.apply [{:event event :payload payload}])
       str)
-     null)
-    null))
+     nil)
+    nil))
 
 (defn- wv_dispatch [^WebViewJsListener self event payload]
   (let [[^Activity activity ^WebView wv] self.state]
