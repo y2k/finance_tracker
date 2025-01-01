@@ -21,5 +21,6 @@
   {:root-ns "app"
    :target-dir ".github/android/app/src/main/java"
    :items ["main"
+           "utils"
            "notifications"
            "repl_service"]}))

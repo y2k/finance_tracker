@@ -6,7 +6,8 @@
                [java.util.function Function])
     (:require ["../interpreter/interpreter" :as i]
               ["./repl_service" :as repl]
-              ["./event_store" :as es]))
+              ["./event_store" :as es]
+              ["./utils" :as u]))
 
 (gen-class
  :name MainActivity
@@ -67,7 +68,7 @@
  :methods [[^JavascriptInterface dispatch [String String] void]])
 
 (defn- make_default_state []
-  (atom (i/make_env {})))
+  (atom (i/make_env {:ext/decode_url (fn [[url]] (u/decode_url url))})))
 
 (def env_atom (make_default_state))
 
