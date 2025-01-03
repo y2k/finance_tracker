@@ -15,6 +15,14 @@ build: gen_build
 	@ mkdir -p .github/android/app/src/main/java/y2k \
 		&& cp $(shell dirname $(ANDROID_PRELUDE_PATH))/RT.java .github/android/app/src/main/java/y2k/RT.java
 
+.PHONE: repl
+repl:
+	@ temp_file=$$(mktemp) && \
+		pbpaste > $$temp_file && \
+		clj2js compile -src $$temp_file -target bytecode > ${OUT_DIR}/domain.bytecode && \
+		export CODE=$$(base64 -i ${OUT_DIR}/domain.bytecode) && \
+		adb shell am start -n y2k.finance_tracker/app.main\\\$$MainActivity -f 0x20000000 --es "code" $$CODE
+
 .PHONE: gen_build
 gen_build:
 	@ export OCAMLRUNPARAM=b && \

@@ -3,11 +3,12 @@
                [android.net Uri]
                [android.os Bundle]
                [android.webkit WebView WebChromeClient ValueCallback JavascriptInterface]
-               [java.util.function Function])
+               [java.util.function Function]
+               [com.google.gson Gson])
     (:require ["../interpreter/interpreter" :as i]
               ["./repl_service" :as repl]
               ["./event_store" :as es]
-              ["./utils" :as u]))
+              ["./database" :as db]))
 
 (gen-class
  :name MainActivity
@@ -18,11 +19,20 @@
            [^Override onActivityResult [int int Intent] void]
            [^Override onNewIntent [Intent] void]])
 
-(defn ^void activity_onNewIntent [^MainActivity self ^Intent intent]
-  (repl/update intent))
+(defn- make_default_state []
+  (atom (i/make_env {})))
+
+(def env_atom (make_default_state))
+
+(defn- live_reload_code [^Intent intent]
+  (repl/update intent)
+  (let [env (-> (deref env_atom) (i/eval (repl/get_code)) second)]
+    (reset! env_atom env)
+    nil))
 
 (defn activity_onCreate [^MainActivity self ^Bundle bundle]
-  (repl/update (.getIntent self))
+  (db/init)
+  (live_reload_code (.getIntent self))
 
   (let [webview (WebView. self)
         webSettings (.getSettings webview)]
@@ -36,6 +46,9 @@
     (.setWebChromeClient webview (WebChromeClientImpl.))
     (.loadUrl webview "file:///android_asset/index.html")
     unit))
+
+(defn ^void activity_onNewIntent [^MainActivity self ^Intent intent]
+  (live_reload_code intent))
 
 (def- filePathCallbackRef (atom null))
 
@@ -67,30 +80,21 @@
  :prefix "wv_"
  :methods [[^JavascriptInterface dispatch [String String] void]])
 
-(defn- make_default_state []
-  (atom (i/make_env {:ext/decode_url (fn [[url]] (u/decode_url url))})))
-
-(def env_atom (make_default_state))
-
 (defn- handle_event [^WebView wv event payload]
-  (let [env (->
-             (deref env_atom)
-             (i/eval (repl/get_code))
-             second)]
-    (reset! env_atom env)
-    (.evaluateJavascript
-     wv
-     (->
-      env :scope (get "user/main")
-      (as Function)
-      (.apply [{:event event :payload payload}])
-      str)
-     nil)
-    nil))
+  (let [effects (->
+                 (deref env_atom) :scope (get "user/main")
+                 (as Function)
+                 (.apply [{:event event :payload payload}]))]
+    (run!
+     (fn [[fx data]]
+       (db/invoke (fn [fx2 data2] (handle_event wv fx2 data2)) fx data)
+       (.evaluateJavascript wv (str "WebView.dispatch(`" fx "`, `" (.toJson (Gson.) data) "`)") nil)
+       nil)
+     effects)))
 
-(defn- wv_dispatch [^WebViewJsListener self event payload]
+(defn- wv_dispatch [^WebViewJsListener self event ^String payload]
   (let [[^Activity activity ^WebView wv] self.state]
     (.runOnUiThread
      activity
-     (runnable (fn! [] (handle_event wv event payload))))
+     (runnable (fn! [] (handle_event wv event (.fromJson (Gson.) payload (class Object))))))
     unit))

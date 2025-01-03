@@ -2,7 +2,7 @@
                [android.util Base64]
                [java.util Arrays]))
 
-(def code_atom (atom ["(" "def*" "user/main" "(" "fn*" "(" "x" ")" "0" ")" ")"]))
+(def code_atom (atom ["(" "def*" "user/main" "(" "fn*" "(" ")" "(" "vector" ")" ")" ")"]))
 
 (defn get_code []
   (deref code_atom))

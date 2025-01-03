@@ -6,17 +6,17 @@
      (createImageBitmap file)
      (.then (fn [bitmap] (.detect barcodeDetector bitmap)))
      (.then (fn [barcodes]
-              (.dispatch window.Android next (:rawValue (get barcodes 0))))))))
+              (.dispatch window.Android next (JSON.stringify barcodes)))))))
 
 (defn- update_ui [query text]
   (.insertAdjacentHTML (.querySelector document query) "beforeend" text))
 
-(defn- register_event [store name handler]
-  (assoc store name handler))
-
 (defn main []
   (set! (.-WebView window)
-        (-> {}
-            (register_event :decode_qr decode_qr)
-            (register_event :update_ui update_ui)))
+        {:dispatch (fn [name payload]
+                     (case name
+                       :println (update_ui "#log" (JSON.parse payload))
+                       :decode_qr (decode_qr (JSON.parse payload))
+                       nil))})
+
   (.dispatch window.Android :home ""))
