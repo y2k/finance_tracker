@@ -1,19 +1,13 @@
-PRELUDE_PATH := vendor/prelude/js/src/prelude.clj
 OUT_DIR := .github/bin
-SRC_DIRS := src/web test vendor/packages/xml
-ANDROID_PRELUDE_PATH := vendor/prelude/java/src/prelude.clj
-ANDROID_SRC_DIRS := android
-ANDROID_OUT_DIR := .github/android/app/src/main/java/y2k/finance_tracker
 
 .PHONY: build
-build: gen_build
-	@ PRELUDE_JAVA=$(ANDROID_PRELUDE_PATH) \
-		PRELUDE_JS=$(PRELUDE_PATH) \
-		PRELUDE_BYTECODE=vendor/prelude/bytecode/prelude.clj \
-		PRELUDE_REPL=vendor/prelude/interpreter/prelude.clj \
-		.github/build2.gen.sh
-	@ mkdir -p .github/android/app/src/main/java/y2k \
-		&& cp $(shell dirname $(ANDROID_PRELUDE_PATH))/RT.java .github/android/app/src/main/java/y2k/RT.java
+build:
+	@ export OCAMLRUNPARAM=b && \
+		clj2js compile -target repl -src res/build.clj > .github/build.gen.sh
+	@ chmod +x .github/build.gen.sh
+	@ .github/build.gen.sh
+	@ mkdir -p .github/android/app/src/main/java/y2k
+	@ clj2js gen -target java > .github/android/app/src/main/java/y2k/RT.java
 
 .PHONE: repl
 repl:
@@ -22,12 +16,6 @@ repl:
 		clj2js compile -src $$temp_file -target bytecode > ${OUT_DIR}/domain.bytecode && \
 		export CODE=$$(base64 -i ${OUT_DIR}/domain.bytecode) && \
 		adb shell am start -n y2k.finance_tracker/app.main\\\$$MainActivity -f 0x20000000 --es "code" $$CODE
-
-.PHONE: gen_build
-gen_build:
-	@ export OCAMLRUNPARAM=b && \
-		clj2js compile -target repl -src res/build.clj > .github/build2.gen.sh
-	@ chmod +x .github/build2.gen.sh
 
 .PHONE: reload
 reload:

@@ -1,4 +1,4 @@
-(ns _ (:require ["../vendor/packages/xml/0.2.0/main" :as xml]))
+(ns _ (:require ["../vendor/xml/0.2.0/main" :as xml]))
 
 (xml/to_string
  [:html {:lang "ru" :data-theme "dark"}

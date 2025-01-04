@@ -1,4 +1,4 @@
-(ns _ (:require ["../vendor/packages/build/0.1.0/main" :as b]))
+(ns _ (:require ["../vendor/build/0.1.0/main" :as b]))
 
 (str
  (b/default)
@@ -15,7 +15,7 @@
  (b/build-files
   {:target "java"
    :root-ns "interpreter"
-   :rules [{:src "vendor/packages/interpreter/java/0.1.0/interpreter.clj"
+   :rules [{:src "vendor/interpreter/java/0.1.0/interpreter.clj"
             :target ".github/android/app/src/main/java/interpreter/interpreter.java"}]})
  (b/build-java-package
   {:root-ns "app"
