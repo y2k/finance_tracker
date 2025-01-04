@@ -62,7 +62,6 @@ install: build
 		-v ${PWD}/.github/android:/target \
 		y2khub/cljdroid build
 	@ adb install -r .github/android/app/build/outputs/apk/debug/app-debug.apk
-	@ adb shell am start -S -n 'y2k.finance_tracker/app.main\$$MainActivity'
 
 .PHONE: test
 test: build

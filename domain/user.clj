@@ -7,9 +7,8 @@
            [:println (ui/button {:title "Test sqlite"
                                  :onclick :test_sqlite_clicked})]]
 
-    ;; :test_sqlite_clicked [[:database {:sql "INSERT INTO main (content) VALUES ('{\"title\": \"Test\"}')"
-    ;;                                   :next :sqlite_executed}]]
-    ;; :test_sqlite_clicked [[:database {:sql "SELECT COUNT(*) FROM main"
+    ;; :test_sqlite_clicked [[:database {:sql "INSERT INTO main (content) VALUES (?)"
+    ;;                                   :args [(ext/to-json {:title "Hello" :description "World"})]
     ;;                                   :next :sqlite_executed}]]
     :test_sqlite_clicked [[:database {:sql "SELECT content->>'title' FROM main"
                                       :next :sqlite_executed}]]

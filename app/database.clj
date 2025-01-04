@@ -6,15 +6,10 @@
   (.execSQL db "CREATE TABLE IF NOT EXISTS main (id INTEGER PRIMARY KEY AUTOINCREMENT, content BLOB)")
   nil)
 
-;;    (println "FIXME")
-
 (defn invoke [dispatch name payload]
-  (println "FIXME3:" name payload)
+  (println "FIXME:DB:" name payload)
   (if (= name :database)
-    (let [c (.rawQuery db (:sql payload) nil)]
-      (if (.moveToFirst c)
-        (dispatch
-         (:next payload)
-         (.getString c 0))
-        nil))
+    (let [c (.rawQuery db (:sql payload) (into-array2 (class String) (:args payload)))
+          result (if (.moveToFirst c) (.getString c 0) nil)]
+      (dispatch (:next payload) result))
     nil))

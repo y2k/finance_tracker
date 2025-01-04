@@ -20,7 +20,7 @@
            [^Override onNewIntent [Intent] void]])
 
 (defn- make_default_state []
-  (atom (i/make_env {})))
+  (atom (i/make_env {:ext/to-json (fn [[x]] (.toJson (Gson.) x))})))
 
 (def env_atom (make_default_state))
 
