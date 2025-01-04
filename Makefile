@@ -1,5 +1,8 @@
 OUT_DIR := .github/bin
 
+.PHONY: test
+test: build
+
 .PHONY: build
 build:
 	@ export OCAMLRUNPARAM=b && \
@@ -8,6 +11,11 @@ build:
 	@ .github/build.gen.sh
 	@ mkdir -p .github/android/app/src/main/java/y2k
 	@ clj2js gen -target java > .github/android/app/src/main/java/y2k/RT.java
+	@ docker run --rm \
+		-v ${PWD}/.github/temp/android:/root/.android \
+		-v ${PWD}/.github/temp/gradle:/root/.gradle \
+		-v ${PWD}/.github/android:/target \
+		y2khub/cljdroid build
 
 .PHONE: repl
 repl:
@@ -44,13 +52,4 @@ clean:
 
 .PHONE: install
 install: build
-	@ docker run --rm \
-		-v ${PWD}/.github/temp/android:/root/.android \
-		-v ${PWD}/.github/temp/gradle:/root/.gradle \
-		-v ${PWD}/.github/android:/target \
-		y2khub/cljdroid build
 	@ adb install -r .github/android/app/build/outputs/apk/debug/app-debug.apk
-
-.PHONE: test
-test: build
-	@ node $(OUT_DIR)/test/test.js

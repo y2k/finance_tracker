@@ -50,13 +50,13 @@
 (defn ^void activity_onNewIntent [^MainActivity self ^Intent intent]
   (live_reload_code intent))
 
-(def- filePathCallbackRef (atom null))
+(def- filePathCallbackRef (atom nil))
 
 (defn activity_onActivityResult [^MainActivity self requestCode ^int resultCode ^Intent data]
   (let [results (WebChromeClient.FileChooserParams/parseResult resultCode data)
         filePathCallback (as (deref filePathCallbackRef) "ValueCallback<Uri[]>")]
     (.onReceiveValue filePathCallback results)
-    (reset! filePathCallbackRef null)
+    (reset! filePathCallbackRef nil)
     unit))
 
 (gen-class
