@@ -81,10 +81,8 @@
  :methods [[^JavascriptInterface dispatch [String String] void]])
 
 (defn- handle_event [^WebView wv event payload]
-  (let [effects (->
-                 (deref env_atom) :scope (get "user/main")
-                 (as Function)
-                 (.apply [{:event event :payload payload}]))]
+  (let [f (-> (deref env_atom) :scope (get "user/main"))
+        effects (f [{:event event :payload payload}])]
     (run!
      (fn [[fx data]]
        (db/invoke (fn [fx2 data2] (handle_event wv fx2 data2)) fx data)

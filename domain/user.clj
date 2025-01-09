@@ -1,5 +1,11 @@
 (ns user (:require ["./ui" :as ui]))
 
+(comment
+
+  (println "FIXME:" (+ 1 2))
+
+  comment)
+
 (defn main [{event :event payload :payload}]
   (case event
     :home [[:println (ui/button {:title "QR"
