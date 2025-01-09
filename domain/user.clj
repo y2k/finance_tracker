@@ -2,7 +2,7 @@
 
 (comment
 
-  (println "FIXME:" (+ 1 2))
+  (ext/dispatch :println "Hello")
 
   comment)
 

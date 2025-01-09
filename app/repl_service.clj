@@ -12,5 +12,4 @@
     (let [enc_code (.getString (.getExtras intent) "code")
           code (String. (Base64/decode enc_code 0))]
       (reset! code_atom (Arrays/asList (.split code "\n")))
-      nil)
-    nil))
+      nil)))

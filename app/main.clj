@@ -30,6 +30,16 @@
     (reset! env_atom env)
     nil))
 
+(declare handle_event)
+
+(defn dispatch [^WebView wv effects]
+  (run!
+   (fn [[fx data]]
+     (db/invoke (fn [fx2 data2] (handle_event wv fx2 data2)) fx data)
+     (.evaluateJavascript wv (str "WebView.dispatch(`" fx "`, `" (.toJson (Gson.) data) "`)") nil)
+     nil)
+   effects))
+
 (defn activity_onCreate [^MainActivity self ^Bundle bundle]
   (db/init)
   (live_reload_code (.getIntent self))
@@ -45,6 +55,11 @@
     (.addJavascriptInterface webview (WebViewJsListener. self webview) "Android")
     (.setWebChromeClient webview (WebChromeClientImpl.))
     (.loadUrl webview "file:///android_asset/index.html")
+    (swap! env_atom
+           (fn [env]
+             (assoc env :scope
+                    (assoc (:scope env) :ext/dispatch
+                           (fn [[fx data]] (dispatch webview [[fx data]]))))))
     unit))
 
 (defn ^void activity_onNewIntent [^MainActivity self ^Intent intent]
@@ -83,12 +98,7 @@
 (defn- handle_event [^WebView wv event payload]
   (let [f (-> (deref env_atom) :scope (get "user/main"))
         effects (f [{:event event :payload payload}])]
-    (run!
-     (fn [[fx data]]
-       (db/invoke (fn [fx2 data2] (handle_event wv fx2 data2)) fx data)
-       (.evaluateJavascript wv (str "WebView.dispatch(`" fx "`, `" (.toJson (Gson.) data) "`)") nil)
-       nil)
-     effects)))
+    (dispatch wv effects)))
 
 (defn- wv_dispatch [^WebViewJsListener self event ^String payload]
   (let [[^Activity activity ^WebView wv] self.state]
