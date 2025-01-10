@@ -24,11 +24,18 @@
 
 (def env_atom (make_default_state))
 
-(defn- live_reload_code [^Intent intent]
+(defn- live_reload_code [^Activity context ^Intent intent]
   (repl/update intent)
-  (let [env (-> (deref env_atom) (i/eval (repl/get_code)) second)]
-    (reset! env_atom env)
-    nil))
+
+  (recover
+   (fn []
+     (let [env (-> (deref env_atom) (i/eval (repl/get_code)) second)]
+       (reset! env_atom env)
+       nil))
+   (fn [e]
+     (.printStackTrace (as e Exception))
+     (.show (android.widget.Toast/makeText context (.toString e) 1))
+     nil)))
 
 (declare handle_event)
 
@@ -42,7 +49,7 @@
 
 (defn activity_onCreate [^MainActivity self ^Bundle bundle]
   (db/init)
-  (live_reload_code (.getIntent self))
+  (live_reload_code self (.getIntent self))
 
   (let [webview (WebView. self)
         webSettings (.getSettings webview)]
@@ -63,7 +70,7 @@
     unit))
 
 (defn ^void activity_onNewIntent [^MainActivity self ^Intent intent]
-  (live_reload_code intent))
+  (live_reload_code self intent))
 
 (def- filePathCallbackRef (atom nil))
 

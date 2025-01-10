@@ -2,7 +2,13 @@
 
 (comment
 
-  (ext/dispatch :println "Hello")
+  (ext/dispatch :println (gensym))
+
+  (bar/foo 1 2)
+
+  (ext/dispatch :println
+                (ui/button {:title (gensym)
+                            :onclick :qr_clicked}))
 
   comment)
 
