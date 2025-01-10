@@ -14,7 +14,7 @@ build:
 		-v ${PWD}/.github/temp/android:/root/.android \
 		-v ${PWD}/.github/temp/gradle:/root/.gradle \
 		-v ${PWD}/.github/android:/target \
-		y2khub/cljdroid build
+		y2khub/cljdroid build -q
 
 .PHONY: repl
 repl:

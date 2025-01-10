@@ -21,4 +21,4 @@
     :root-ns "app"
     :src-dir "app"
     :target-dir ".github/android/app/src/main/java"
-    :items ["main" "database" "notifications" "repl_service"]})])
+    :items ["main" "database" "notifications" "repl_service" "message_broker" "webview"]})])

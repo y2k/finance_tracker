@@ -9,14 +9,15 @@
               (.dispatch window.Android next (JSON.stringify barcodes)))))))
 
 (defn- update_ui [query text]
-  (.insertAdjacentHTML (.querySelector document query) "beforeend" text))
+  (.insertAdjacentHTML (.querySelector document query) :beforeend text))
 
 (defn main []
+  (eprintln "FIXME:WEB:main")
   (set! (.-WebView window)
         {:dispatch (fn [name payload]
+                     (eprintln "FIXME:WEB:dispatch:" name payload)
                      (case name
                        :println (update_ui "#log" (JSON.parse payload))
                        :decode_qr (decode_qr (JSON.parse payload))
                        nil))})
-
   (.dispatch window.Android :home ""))
