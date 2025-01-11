@@ -12,12 +12,12 @@
   (.insertAdjacentHTML (.querySelector document query) :beforeend text))
 
 (defn main []
-  (eprintln "FIXME:WEB:main")
   (set! (.-WebView window)
         {:dispatch (fn [name payload]
-                     (eprintln "FIXME:WEB:dispatch:" name payload)
                      (case name
                        :println (update_ui "#log" (JSON.parse payload))
                        :decode_qr (decode_qr (JSON.parse payload))
                        nil))})
+  (.register window.Android :println)
+  (.register window.Android :decode_qr)
   (.dispatch window.Android :home ""))

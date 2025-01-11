@@ -31,6 +31,12 @@ reload:
 	@ export CODE=$$(base64 -i ${OUT_DIR}/domain.bytecode) && \
 		adb shell am start -n y2k.finance_tracker/app.main\\\$$MainActivity -f 0x20000000 --es "code" $$CODE
 
+.PHONY: reload_file
+reload_file:
+	@ clj2js compile -target bytecode -src $(FILE) > ${OUT_DIR}/domain.bytecode
+	@ export CODE=$$(base64 -i ${OUT_DIR}/domain.bytecode) && \
+		adb shell am start -n y2k.finance_tracker/app.main\\\$$MainActivity -f 0x20000000 --es "code" $$CODE
+
 .PHONY: run
 run: install hard_reload
 

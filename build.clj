@@ -12,13 +12,13 @@
     :items ["domain"]})
   (b/module
    {:lang "java"
-    :root-ns "interpreter"
-    :src-dir "vendor/interpreter/java/0.1.0"
-    :target-dir ".github/android/app/src/main/java/interpreter"
-    :items ["interpreter"]})
-  (b/module
-   {:lang "java"
     :root-ns "app"
     :src-dir "app"
     :target-dir ".github/android/app/src/main/java"
-    :items ["main" "database" "notifications" "repl_service" "message_broker" "webview"]})])
+    :items ["main" "database" "notifications" "repl_service" "message_broker" "webview" "domain"]})
+  (b/module
+   {:lang "java"
+    :root-ns "interpreter"
+    :src-dir "vendor/interpreter/java/0.1.0"
+    :target-dir ".github/android/app/src/main/java/interpreter"
+    :items ["interpreter"]})])

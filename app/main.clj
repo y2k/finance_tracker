@@ -3,7 +3,8 @@
                 ["./event_store" :as es]
                 ["./database" :as db]
                 ["./message_broker" :as mb]
-                ["./webview" :as wv])
+                ["./webview" :as wv]
+                ["./domain" :as d])
     (:import [android.app Activity]
              [android.content Intent]
              [android.net Uri]
@@ -21,14 +22,9 @@
            [^Override onActivityResult [int int Intent] void]
            [^Override onNewIntent [Intent] void]])
 
-(def env_atom (atom
-               (i/make_env {:ext/to-json (fn [[x]] (.toJson (Gson.) x))
-                            :user/main (fn [args] nil)})))
+(def env_atom (atom (i/make_env {})))
 
 (defn activity_onCreate [^MainActivity self ^Bundle bundle]
-  (db/init)
-  (repl/live_reload_code env_atom self (.getIntent self))
-
   (let [broker_atom (atom (mb/make))
         dispatch (fn [event payload]
                    (mb/dispatch (deref broker_atom) event payload))
@@ -37,11 +33,23 @@
         webview (wv/make_webview self dispatch register)]
     (.setContentView self webview)
 
-    (register :home
-              (fn [payload]
-                (let [f (-> (deref env_atom) :scope (get "user/main"))
-                      effects (f [{:event :home :payload payload}])]
-                  (run! (fn [[e p]] (dispatch e p)) effects))))))
+    (db/main register dispatch)
+
+    (d/main register dispatch)
+
+    (reset!
+     env_atom
+     (i/make_env {:ext/to-json (fn [[x]] (.toJson (Gson.) x))
+                  :ext/dispatch (fn [[event payload]] (dispatch event payload))
+                  ;; :ext/reg-event (fn [[name f]]
+                  ;;                  (register
+                  ;;                   name (fn [payload]
+                  ;;                          (let [effects (f [payload])]
+                  ;;                            (run! (fn [[e p]] (dispatch e p)) effects)))))
+                  }))
+
+    ;; (repl/live_reload_code env_atom self (.getIntent self))
+    nil))
 
 (defn activity_onNewIntent [^MainActivity self ^Intent intent]
   (repl/live_reload_code env_atom self intent))

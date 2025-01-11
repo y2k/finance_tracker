@@ -3,7 +3,6 @@
 (defn make [] {:handlers {}})
 
 (defn register [broker key handler]
-  (println "FIXME:register:" key)
   (assoc broker :handlers
          (assoc (:handlers broker) key handler)))
 

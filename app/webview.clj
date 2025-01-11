@@ -14,15 +14,9 @@
     (.setAllowFileAccess webSettings true)
     (.setAllowFileAccessFromFileURLs webSettings true)
     (.setAllowUniversalAccessFromFileURLs webSettings true)
-    (.addJavascriptInterface webview (WebViewJsListener. context webview dispatch) "Android")
+    (.addJavascriptInterface webview (WebViewJsListener. context webview dispatch register) :Android)
     (.setWebChromeClient webview (WebChromeClientImpl.))
     (.loadUrl webview "file:///android_asset/index.html")
-
-    (register :println (fn [data]
-                         (println "FIXME:WV:println:" data)
-                         (.evaluateJavascript
-                          webview (str "WebView.dispatch(`println`, `" (.toJson (Gson.) data) "`)") nil)
-                         nil))
     webview))
 
 ;; WebChromeClientImpl
@@ -55,9 +49,17 @@
 (gen-class
  :name WebViewJsListener
  :extends Object
- :constructors {[Activity WebView Object] []}
+ :constructors {[Activity WebView Object Object] []}
  :prefix "wv_"
- :methods [[^JavascriptInterface dispatch [String String] void]])
+ :methods [[^JavascriptInterface register [String] void]
+           [^JavascriptInterface dispatch [String String] void]])
+
+(defn- wv_register [^WebViewJsListener self ^String name]
+  (let [[_ ^WebView wv _ register] self.state]
+    (register name (fn [data]
+                     (.evaluateJavascript
+                      wv (str "WebView.dispatch(`" name "`, `" (.toJson (Gson.) data) "`)") nil)
+                     nil))))
 
 (defn- wv_dispatch [^WebViewJsListener self event ^String payload]
   (let [[^Activity activity ^WebView wv dispatch] self.state
