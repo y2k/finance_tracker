@@ -1,7 +1,7 @@
 OUT_DIR := .github/bin
 
 .PHONY: test
-test: build
+test: clean build
 
 .PHONY: build
 build:
