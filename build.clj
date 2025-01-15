@@ -1,4 +1,4 @@
-(ns _ (:require ["vendor/make/0.1.0/main" :as b]))
+(ns _ (:require ["vendor/make/0.2.0/main" :as b]))
 
 (b/generate
  [(b/module-files
@@ -16,9 +16,7 @@
     :src-dir "app"
     :target-dir ".github/android/app/src/main/java"
     :items ["main" "database" "notifications" "repl_service" "message_broker" "webview" "domain"]})
-  (b/module
+  (b/vendor
    {:lang "java"
-    :root-ns "interpreter"
-    :src-dir "vendor/interpreter/java/0.1.0"
-    :target-dir ".github/android/app/src/main/java/interpreter"
-    :items ["interpreter"]})])
+    :target-dir ".github/android/app/src/main/java"
+    :items [{:name "interpreter" :version "0.2.0"}]})])
