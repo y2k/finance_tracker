@@ -14,8 +14,14 @@
    {:lang "java"
     :root-ns "app"
     :src-dir "app"
-    :target-dir ".github/android/app/src/main/java"
-    :items ["main" "database" "notifications" "repl_service" "message_broker" "webview" "domain"]})
+    :target-dir ".github/android/app/src/main/java/app"
+    :items ["main" "effect" "database" "notifications" "repl_service" "message_broker" "webview" "domain"]})
+  (b/module
+   {:lang "java"
+    :root-ns "test"
+    :src-dir "test"
+    :target-dir ".github/android/app/src/test/java/test"
+    :items ["test"]})
   (b/vendor
    {:lang "java"
     :target-dir ".github/android/app/src/main/java"

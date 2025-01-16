@@ -1,20 +1,31 @@
 OUT_DIR := .github/bin
 
+# .PHONY: test
+# test: clean build
+
 .PHONY: test
-test: clean build
+test: clean build_clj
+	@ docker run --rm \
+		-v ${PWD}/.github/temp/android:/root/.android \
+		-v ${PWD}/.github/temp/gradle:/root/.gradle \
+		-v ${PWD}/.github/android:/target \
+		y2khub/cljdroid test
 
 .PHONY: build
-build:
+build: build_clj
+	@ docker run --rm \
+		-v ${PWD}/.github/temp/android:/root/.android \
+		-v ${PWD}/.github/temp/gradle:/root/.gradle \
+		-v ${PWD}/.github/android:/target \
+		y2khub/cljdroid build
+
+.PHONY: build_clj
+build_clj:
 	@ export OCAMLRUNPARAM=b && \
 		clj2js compile -target repl -src build.clj > .github/Makefile
 	@ $(MAKE) -f .github/Makefile
 	@ mkdir -p .github/android/app/src/main/java/y2k && \
 		clj2js gen -target java > .github/android/app/src/main/java/y2k/RT.java
-	@ docker run --rm \
-		-v ${PWD}/.github/temp/android:/root/.android \
-		-v ${PWD}/.github/temp/gradle:/root/.gradle \
-		-v ${PWD}/.github/android:/target \
-		y2khub/cljdroid build -q
 
 .PHONY: repl
 repl:
@@ -52,8 +63,9 @@ clean:
 	@ rm -rf $(OUT_DIR)
 	@ rm -rf .github/android/app/src/main/assets/web
 	@ rm -rf .github/android/app/src/main/assets/index.html
-	@ rm -rf .github/android/app/src/main/java
 	@ rm -rf .github/android/app/src/main/AndroidManifest.xml
+	@ rm -rf .github/android/app/src/main/java
+	@ rm -rf .github/android/app/src/test/java
 
 .PHONY: install
 install: build

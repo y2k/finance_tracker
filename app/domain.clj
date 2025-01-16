@@ -1,4 +1,4 @@
-(ns _)
+(ns _ (:require ["./effect" :as e]))
 
 ;; UI
 
@@ -12,57 +12,53 @@
   (let [id (gensym)]
     (str "<input id='" id "' onchange=\\\"Android.dispatch('" onclick "', '" id "')\\\" type='file' accept='image/*' class='input'>")))
 
+(defn- group [children]
+  (str "<div class='group'>"
+       (reduce (fn [acc x] (str acc x)) "" children)
+       "</div>"))
+
+;; Effects
+
+(defn- printlnfx [p]
+  (fn [w] (let [fx (:println w)] (fx p))))
+
+(defn- decode_qrfx [p]
+  (fn [w] (let [fx (:decode_qr w)] (fx p))))
+
 ;; Domain
 
-(comment
-
-  (defn foo [a b] (+ a b))
-
-  (ext/dispatch :println (gensym))
-
-  (ext/dispatch :println
-                (ui/button {:title (gensym)
-                            :onclick :qr_clicked}))
-
-  (ext/dispatch :home {})
-
-  (ext/reg-event :home
-                 (fn []
-                   [[:println (ui/button {:title "FIXME"
-                                          :onclick :home})]]))
-
-  comment)
-
-(defn- make_event_handler [register dispatch]
-  (fn [event handler]
-    (register event
-              (fn [payload]
-                (run!
-                 (fn [[e_name e_payload]]
-                   (dispatch e_name e_payload))
-                 (handler payload))))))
-
 (defn home []
-  [[:println (button {:title "QR"
-                      :onclick :qr_clicked})]
-   [:println (button {:title "Test sqlite"
-                      :onclick :test_sqlite_clicked})]])
+  (printlnfx
+   (group [(button {:title "QR"
+                    :onclick :qr_clicked})
+           (button {:title "Test sqlite"
+                    :onclick :test_sqlite_clicked})])))
+
+(defn qr_clicked [args]
+  (printlnfx (input {:onclick :file_selected})))
+
+(defn file_selected [payload]
+  (e/batch
+   [(printlnfx (label {:text "Пожалуйста, подождите..."}))
+    (decode_qrfx {:id payload :next :qr_recognized})]))
+
+(defn qr_recognized [[payload]]
+  (e/batch
+   [(printlnfx (label {:text (str "Результат: " (:rawValue payload))}))
+    (printlnfx (button {:title "Home"
+                        :onclick :home}))]))
+
+;; Infrastructure
 
 (defn main [register dispatch]
-  (let [reg_event (make_event_handler register dispatch)]
-    (reg_event :home (fn [args] (home)))
-
-    (reg_event :qr_clicked
-               (fn [args]
-                 [[:println (input {:onclick :file_selected})]]))
-
-    (reg_event :file_selected
-               (fn [payload]
-                 [[:println (label {:text "Пожалуйста, подождите..."})]
-                  [:decode_qr {:id payload :next :qr_recognized}]]))
-
-    (reg_event :qr_recognized
-               (fn [[payload]]
-                 [[:println (label {:text (str "Результат: " (:rawValue payload))})]
-                  [:println (button {:title "Home"
-                                     :onclick :home})]]))))
+  (let [w {:println (fn [x] (dispatch :println x))
+           :decode_qr (fn [x] (dispatch :decode_qr x))}
+        reg_event (fn [event handler]
+                    (register event
+                              (fn [payload]
+                                (let [r (handler payload)]
+                                  (r w)))))]
+    (reg_event :home (fn [_] (home)))
+    (reg_event :qr_clicked (fn [x] (qr_clicked x)))
+    (reg_event :file_selected (fn [x] (file_selected x)))
+    (reg_event :qr_recognized (fn [x] (qr_recognized x)))))

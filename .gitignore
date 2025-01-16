@@ -8,7 +8,8 @@
 /.github/android/app/src/main/assets/shared/
 /.github/android/app/src/main/assets/web/
 /.github/android/app/src/main/java/
+/.github/android/app/src/test
 /.github/bin/
+/.github/Makefile
 /.github/temp/
 /.vscode/
-/.github/Makefile
