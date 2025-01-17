@@ -1,4 +1,4 @@
-(ns _ (:require ["./effect" :as e]))
+(ns domain (:require ["./effect" :as e]))
 
 ;; UI
 
@@ -51,14 +51,15 @@
 ;; Infrastructure
 
 (defn main [register dispatch]
-  (let [w {:println (fn [x] (dispatch :println x))
-           :decode_qr (fn [x] (dispatch :decode_qr x))}
-        reg_event (fn [event handler]
-                    (register event
-                              (fn [payload]
-                                (let [r (handler payload)]
-                                  (r w)))))]
-    (reg_event :home (fn [_] (home)))
-    (reg_event :qr_clicked (fn [x] (qr_clicked x)))
-    (reg_event :file_selected (fn [x] (file_selected x)))
-    (reg_event :qr_recognized (fn [x] (qr_recognized x)))))
+  ;; (let [w {:println (fn [x] (dispatch :println x))
+  ;;          :decode_qr (fn [x] (dispatch :decode_qr x))}
+  ;;       reg_event (fn [event handler]
+  ;;                   (register event
+  ;;                             (fn [payload]
+  ;;                               (let [r (handler payload)]
+  ;;                                 (r w)))))]
+  ;;   (reg_event :home (fn [_] (home)))
+  ;;   (reg_event :qr_clicked (fn [x] (qr_clicked x)))
+  ;;   (reg_event :file_selected (fn [x] (file_selected x)))
+  ;;   (reg_event :qr_recognized (fn [x] (qr_recognized x))))
+  nil)

@@ -1,8 +1,5 @@
 OUT_DIR := .github/bin
 
-# .PHONY: test
-# test: clean build
-
 .PHONY: test
 test: clean build_clj
 	@ docker run --rm \
@@ -44,6 +41,7 @@ reload:
 
 .PHONY: reload_file
 reload_file:
+	@ mkdir -p ${OUT_DIR}
 	@ clj2js compile -target bytecode -src $(FILE) > ${OUT_DIR}/domain.bytecode
 	@ export CODE=$$(base64 -i ${OUT_DIR}/domain.bytecode) && \
 		adb shell am start -n y2k.finance_tracker/app.main\\\$$MainActivity -f 0x20000000 --es "code" $$CODE
@@ -54,7 +52,7 @@ run: install hard_reload
 .PHONY: hard_reload
 hard_reload:
 	@ mkdir -p ${OUT_DIR}
-	@ clj2js compile -target bytecode -src domain/user.clj > ${OUT_DIR}/domain.bytecode
+	@ clj2js compile -target bytecode -src domain/domain.clj > ${OUT_DIR}/domain.bytecode
 	@ export CODE=$$(base64 -i ${OUT_DIR}/domain.bytecode) && \
 		adb shell am start -S -n y2k.finance_tracker/app.main\\\$$MainActivity --es "code" $$CODE
 
