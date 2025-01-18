@@ -1,6 +1,5 @@
 (ns domain
-  (:require ["../app/effect" :as e])
-  )
+  (:require ["../app/effect" :as e]))
 
 ;; UI
 
@@ -36,16 +35,16 @@
            (button {:title "Test sqlite"
                     :onclick :test_sqlite_clicked})])))
 
-;; (defn qr_clicked [args]
-;;   (printlnfx (input {:onclick :file_selected})))
+(defn qr_clicked [args]
+  (printlnfx (input {:onclick :file_selected})))
 
-;; (defn file_selected [payload]
-;;   (e/batch
-;;    [(printlnfx (label {:text "Пожалуйста, подождите..."}))
-;;     (decode_qrfx {:id payload :next :qr_recognized})]))
+(defn file_selected [payload]
+  (e/batch
+   [(printlnfx (label {:text "Пожалуйста, подождите..."}))
+    (decode_qrfx {:id payload :next :qr_recognized})]))
 
-;; (defn qr_recognized [[payload]]
-;;   (e/batch
-;;    [(printlnfx (label {:text (str "Результат: " (:rawValue payload))}))
-;;     (printlnfx (button {:title "Home"
-;;                         :onclick :home}))]))
+(defn qr_recognized [[payload]]
+  (e/batch
+   [(printlnfx (label {:text (str "Результат: " (:rawValue payload))}))
+    (printlnfx (button {:title "Home"
+                        :onclick :home}))]))

@@ -23,8 +23,10 @@
      (let [env (update intent (deref env_atom))]
        (reset! env_atom env)
 ;;
-       (let [f (get (:scope env) "domain/home")]
-         (f []))
+       (let [f (get (:scope env) "domain/home")
+             w (:world env)
+             fx (f [])]
+         (fx [w]))
 ;;
        nil))
    (fn [e]
@@ -33,23 +35,26 @@
      nil)))
 
 (defn main [register dispatch]
-  (reset! env_atom
-          (i/make_env {:ext/to-json (fn [[x]] (.toJson (Gson.) x))
-                       :ext/dispatch (fn [[event payload]] (dispatch event payload))}))
+  (let [w {:println (fn [[x]] (dispatch :println x))
+           :decode_qr (fn [[x]] (dispatch :decode_qr x))}]
 
-  (let [w {:println (fn [x] (dispatch :println x))
-           :decode_qr (fn [x] (dispatch :decode_qr x))}
-        reg_event (fn [event]
-                    (register event
-                              (fn [payload]
-                                (let [env (deref env_atom)
-                                      fname (str "domain/" event)
-                                      f (get (:scope env) fname)]
-                                  (if (some? f)
-                                    (let [fx (f [payload])]
-                                      (fx w)))))))]
+    (reset! env_atom
+            (assoc
+             (i/make_env {:ext/to-json (fn [[x]] (.toJson (Gson.) x))
+                          :ext/dispatch (fn [[event payload]] (dispatch event payload))})
+             :world w))
 
-    (reg_event :home)
-    (reg_event :qr_clicked)
-    (reg_event :file_selected)
-    (reg_event :qr_recognized)))
+    (let [reg_event (fn [event]
+                      (register event
+                                (fn [payload]
+                                  (let [env (deref env_atom)
+                                        fname (str "domain/" event)
+                                        f (get (:scope env) fname)]
+                                    (if (some? f)
+                                      (let [fx (f [payload])]
+                                        (fx w)))))))]
+
+      (reg_event :home)
+      (reg_event :qr_clicked)
+      (reg_event :file_selected)
+      (reg_event :qr_recognized))))
