@@ -22,12 +22,10 @@
    (fn []
      (let [env (update intent (deref env_atom))]
        (reset! env_atom env)
-;;
        (let [f (get (:scope env) "domain/home")
              w (:world env)
              fx (f [])]
          (fx [w]))
-;;
        nil))
    (fn [e]
      (.printStackTrace (as e Exception))
@@ -52,7 +50,7 @@
                                         f (get (:scope env) fname)]
                                     (if (some? f)
                                       (let [fx (f [payload])]
-                                        (fx w)))))))]
+                                        (fx [w])))))))]
 
       (reg_event :home)
       (reg_event :qr_clicked)

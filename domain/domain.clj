@@ -18,7 +18,7 @@
        (reduce (fn [acc x] (str acc x)) "" children)
        "</div>"))
 
-;; ;; Effects
+;; Effects
 
 (defn- printlnfx [p]
   (fn [w] (let [fx (:println w)] (fx p))))
@@ -35,7 +35,7 @@
            (button {:title "Test sqlite"
                     :onclick :test_sqlite_clicked})])))
 
-(defn qr_clicked [args]
+(defn qr_clicked [_]
   (printlnfx (input {:onclick :file_selected})))
 
 (defn file_selected [payload]
