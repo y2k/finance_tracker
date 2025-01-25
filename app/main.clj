@@ -36,7 +36,6 @@
     (d/main register dispatch)
     (repl/main register dispatch)
 
-    ;; (repl/live_reload_code env_atom self (.getIntent self))
     nil))
 
 (defn activity_onNewIntent [^MainActivity self ^Intent intent]

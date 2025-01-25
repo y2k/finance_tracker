@@ -22,7 +22,7 @@
    (fn []
      (let [env (update intent (deref env_atom))]
        (reset! env_atom env)
-       (let [f (get (:scope env) "domain/home")
+       (let [f (deref (get (:ns env) "domain/home"))
              w (:world env)
              fx (f [])]
          (fx [w]))
@@ -47,9 +47,10 @@
                                 (fn [payload]
                                   (let [env (deref env_atom)
                                         fname (str "domain/" event)
-                                        f (get (:scope env) fname)]
-                                    (if (some? f)
-                                      (let [fx (f [payload])]
+                                        fatom (get (:ns env) fname)]
+                                    (if (some? fatom)
+                                      (let [f (deref fatom)
+                                            fx (f [payload])]
                                         (fx [w])))))))]
 
       (reg_event :home)
