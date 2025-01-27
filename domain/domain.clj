@@ -40,7 +40,7 @@
 
 (defn file_selected [payload]
   (e/batch
-   [(printlnfx (label {:text "Пожалуйста, подождите..."}))
+  [(printlnfx (label {:text "Please wait..."}))
     (decode_qrfx {:id payload :next :qr_recognized})]))
 
 (defn qr_recognized [[payload]]
