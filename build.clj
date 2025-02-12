@@ -15,7 +15,7 @@
     :root-ns "app"
     :src-dir "app"
     :target-dir ".github/android/app/src/main/java/app"
-    :items ["main" "effect" "database" "notifications" "repl_service" "message_broker" "webview" "domain"]})
+    :items ["main" "effect" "database" "notifications" "repl_service" "message_broker" "webview" "domain" "client"]})
   (b/module
    {:lang "java"
     :root-ns "test"
