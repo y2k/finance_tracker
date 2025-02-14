@@ -6,7 +6,7 @@ test: clean build_clj
 		-v ${PWD}/.github/temp/android:/root/.android \
 		-v ${PWD}/.github/temp/gradle:/root/.gradle \
 		-v ${PWD}/.github/android:/target \
-		y2khub/cljdroid test
+		y2khub/cljdroid test || open ".github/android/app/build/reports/tests/testDebugUnitTest/index.html"
 
 .PHONY: build
 build: build_clj

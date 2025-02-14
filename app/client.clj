@@ -10,8 +10,8 @@
       (body)
       (loop condition body))))
 
-(defn dispatch [event payload]
-  (fn [w] ((:dispatch w) {:event event :payload payload})))
+;; (defn dispatch [event payload]
+;;   (fn [w] ((:dispatch w) {:event event :payload payload})))
 
 (defn register [event handler]
   (fn [w] ((:register w) {:event event :handler handler})))
