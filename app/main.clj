@@ -1,10 +1,9 @@
-(ns _ (:require ["../interpreter/interpreter" :as i]
-                ["./repl_service" :as repl]
-                ["./event_store" :as es]
+(ns _ (:require ["./repl_service" :as repl]
                 ["./database" :as db]
                 ["./message_broker" :as mb]
                 ["./webview" :as wv]
-                ["./domain" :as d])
+                ["./domain" :as d]
+                ["./client" :as nrepl])
     (:import [android.app Activity]
              [android.content Intent]
              [android.net Uri]
@@ -20,7 +19,26 @@
  :prefix "activity_"
  :methods [[^Override onCreate [Bundle] void]
            [^Override onActivityResult [int int Intent] void]
-           [^Override onNewIntent [Intent] void]])
+           [^Override onNewIntent [Intent] void]
+           [^Override onResume [] void]
+           [^Override onPause [] void]])
+
+(def- state_atom (atom {:handlers []}))
+
+(defn activity_onResume [^MainActivity self]
+  (let [world {:register (fn [{event :event handler :handler}]
+                           (swap! state_atom
+                                  (fn [state]
+                                    (assoc state :handlers
+                                           (conj (:handlers state) [event handler])))))}]
+    ((nrepl/main) world)
+    ;;
+    ))
+
+(defn- activity_onPause [^MainActivity self]
+  (run!
+   (fn [[event handler]] (if (= event :dispose) ((handler nil) {})))
+   (:handlers (deref state_atom))))
 
 (defn activity_onCreate [^MainActivity self ^Bundle bundle]
   (let [broker_atom (atom (mb/make))
