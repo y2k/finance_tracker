@@ -1,4 +1,4 @@
-(ns _ (:import [java.net ServerSocket URL HttpURLConnection])
+(ns _ (:import [java.net ServerSocket])
     (:require ["../interpreter/interpreter" :as i]
               ["./effect" :as e]))
 
@@ -17,7 +17,7 @@
   (fn [w] ((:register w) {:event event :handler handler})))
 
 ;; execute : String -> String
-(defn- start [server execute]
+(defn- start [^ServerSocket server execute]
   (recover
    (fn [] (loop (fn [] (not (Thread/interrupted)))
             (fn []
@@ -34,8 +34,8 @@
    (fn [] nil)))
 
 (defn main []
-  (let [server (ServerSocket. 8080)
+  (let [^ServerSocket server (recover (fn [] (ServerSocket. 8080)) (fn [] (FIXME)))
         t (Thread. (fn [] (start server (FIXME))))]
     (e/batch
-     [(fn [_] (.start t))
-      (register :dispose (fn [_] (fn [_] (.close server) (.interrupt t) (.join t))))])))
+     [(fn [_] (.start t) nil)
+      (register :dispose (fn [_] (fn [_] (.close server) (.interrupt t) (.join t) nil)))])))
