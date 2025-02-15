@@ -34,7 +34,7 @@
    (fn [] nil)))
 
 (defn main []
-  (let [^ServerSocket server (recover (fn [] (ServerSocket. 8080)) (fn [] (FIXME)))
+  (let [^ServerSocket server (recover (fn [] (ServerSocket. 8090)) (fn [] (FIXME)))
         t (Thread. (fn [] (start server (FIXME))))]
     (e/batch
      [(fn [_] (.start t) nil)
