@@ -14,7 +14,10 @@
 ;;   (fn [w] ((:dispatch w) {:event event :payload payload})))
 
 (defn register [event handler]
-  (fn [w] ((:register w) {:event event :handler handler})))
+  (fn [w] ((:register w) event handler)))
+
+(defn thunk [description f]
+  (fn [w] ((:thunk w) description f)))
 
 ;; execute : String -> String
 (defn- start [^ServerSocket server execute]
@@ -33,9 +36,15 @@
                 nil))))
    (fn [] nil)))
 
+;; (thunk :start_thread (fn [] (.start t) nil))
+
+(defn th_start [t]
+  (thunk :start_thread (fn [] (.start t) nil)))
+
 (defn main []
   (let [^ServerSocket server (recover (fn [] (ServerSocket. 8090)) (fn [] (FIXME)))
         t (Thread. (fn [] (start server (FIXME))))]
     (e/batch
-     [(fn [_] (.start t) nil)
-      (register :dispose (fn [_] (fn [_] (.close server) (.interrupt t) (.join t) nil)))])))
+     [(th_start t)
+      (register :dispose (fn [_]
+                           (thunk :stop_server (fn [] (.close server) (.interrupt t) (.join t) nil))))])))

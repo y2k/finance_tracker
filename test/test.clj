@@ -17,5 +17,8 @@
       (FIXME "Test failed\nExpected: " expected "\nActual: " (deref actual_atom)))))
 
 (defn- test_nrepl [_]
-  (let [w {:register (fn [x] (FIXME "LOG1:" x))}]
-    ((c/main) w)))
+  (let [log (atom [])
+        w {:register (fn [x _] (reset! log (conj (deref log) {:fx :register :data x})) nil)
+           :thunk (fn [x _] (reset! log (conj (deref log) {:fx :thunk :data x})) nil)}]
+    ((c/main) w))
+  (FIXME (deref log)))
