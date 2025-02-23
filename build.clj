@@ -25,4 +25,6 @@
   (b/vendor
    {:lang "java"
     :target-dir ".github/android/app/src/main/java"
-    :items [{:name "interpreter" :version "0.3.0"}]})])
+    :items [{:name "interpreter" :version "0.3.0"}
+            {:name "effects"     :version "0.2.0"}
+            {:name "socket"     :version "0.1.0"}]})])

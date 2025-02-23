@@ -31,7 +31,8 @@
                                   (fn [state]
                                     (assoc state :handlers
                                            (conj (:handlers state) [event handler])))))}]
-    ((nrepl/main) world)
+    ;; ((nrepl/main) world)
+    nil
     ;;
     ))
 
