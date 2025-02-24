@@ -1,8 +1,8 @@
-(ns _
-  (:import [org.junit Test])
-  (:require ["../app/domain" :as d]
-            ["../app/client" :as c]
-            ["../interpreter/interpreter" :as i]))
+(ns _ (:import [org.junit Test]
+               [java.net Socket InetSocketAddress])
+    (:require ["../app/domain" :as d]
+              ["../app/client" :as c]
+              ["../interpreter/interpreter" :as i]))
 
 (gen-class :name Tests :extends Object :constructors {[] []} :prefix "_" :methods
            [[^Test test [] void]
@@ -18,18 +18,15 @@
       (FIXME "Test failed\nExpected: " expected "\nActual: " (deref actual_atom)))))
 
 (defn- _eval_by_socket_executed [_]
-  (let [log (atom [])
-        actual (atom nil)
-        w {:thunk (fn [[x payload] _]
-                    (reset! log (conj (deref log) {:fx x :data payload}))
-                    (case x
-                      :read_from_server_socket [[(.getBytes "(\n+\n2\n2\n)") nil] nil]
-                      :reset_fx [nil nil]
-                      :write (do
-                               (reset! actual (String. (as (:data payload) "byte[]")))
-                               [nil 1])
-                      (FIXME x ", " payload)))}
-        env_atom (atom (i/make_env {}))]
-    ((c/main_loop env_atom nil) w))
-  (if (not= "4" (deref actual))
-    (FIXME actual)))
+  (checked!
+   (let [close_server (c/main 8090 (atom (i/make_env {})))
+         socket (Socket.)]
+     (.connect socket (InetSocketAddress. "localhost" 8090) 1000)
+     (let [out (.getOutputStream socket)
+           in (.getInputStream socket)]
+       (.write out (.getBytes "(\n+\n2\n2\n)"))
+       (.shutdownOutput socket)
+       (let [actual (String. (.readAllBytes in))]
+         (close_server)
+         (if (not= "4" actual)
+           (FIXME actual)))))))

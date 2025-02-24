@@ -1,29 +1,27 @@
 (ns _ (:import [java.net ServerSocket Socket])
-    (:require ["../interpreter/interpreter" :as i]
-              ["../effects/effects" :as e]
-              ["../socket/socket" :as st]))
+    (:require ["../interpreter/interpreter" :as i]))
 
-(defn reset_fx [a value]
-  (e/thunk :reset_fx nil (fn [] (reset! a value) nil)))
+(defn- main_loop [env_atom ^ServerSocket server]
+  (recover
+   (fn [] (let [^Socket socket (recover (fn [] (.accept server)) (fn [] nil))]
+            (if (some? socket)
+              (let [in (.getInputStream socket)
+                    input_bytes (.readAllBytes in)
+                    lexems (vec (.split (String. input_bytes) "\\n"))
+                    [result env] (i/eval (deref env_atom) lexems)]
+                (reset! env_atom env)
+                (.write (.getOutputStream socket) (.getBytes (str result)))
+                (.close socket)
+                (main_loop env_atom server)))))
+   (fn [] (FIXME))))
 
-(defn main_loop [env_atom server]
-  (e/then
-   (st/read server)
-   (fn [[^"byte[]" input_bytes sockt]]
-     (let [lexems (vec (.split (String. input_bytes) "\\n"))
-           [result env] (i/eval (deref env_atom) lexems)]
-       (e/batch
-        [(reset_fx env_atom env)
-         (st/write sockt (.getBytes (str result)) {:close true})
-         (main_loop env_atom server)])))))
-
-(defn main [env env_atom]
+(defn main [^int port env_atom]
   (let [server_socket (atom nil)]
     (.start
      (Thread.
       (fn []
-        (reset! server_socket (ServerSocket. 8090))
-        ((main_loop env_atom (deref server_socket)) env))))
+        (reset! server_socket (ServerSocket. port))
+        (main_loop env_atom (as (deref server_socket) ServerSocket)))))
     (fn []
       (.close (as (deref server_socket) ServerSocket))
       nil)))
