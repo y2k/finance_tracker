@@ -26,15 +26,8 @@
 (def- state_atom (atom {:handlers []}))
 
 (defn activity_onResume [^MainActivity self]
-  (let [world {:register (fn [{event :event handler :handler}]
-                           (swap! state_atom
-                                  (fn [state]
-                                    (assoc state :handlers
-                                           (conj (:handlers state) [event handler])))))}]
-    ;; ((nrepl/main) world)
-    nil
-    ;;
-    ))
+  (let [env_atom (nrepl/make_env)]
+    (nrepl/main 8090 env_atom)))
 
 (defn- activity_onPause [^MainActivity self]
   (run!
