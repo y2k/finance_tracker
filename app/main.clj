@@ -3,7 +3,8 @@
                 ["./message_broker" :as mb]
                 ["./webview" :as wv]
                 ["./domain" :as d]
-                ["./client" :as nrepl])
+                ["../nrepl/nrepl" :as nrepl]
+                ["../interpreter/interpreter" :as i])
     (:import [android.app Activity]
              [android.content Intent]
              [android.net Uri]
@@ -11,6 +12,12 @@
              [android.webkit WebView WebChromeClient ValueCallback JavascriptInterface]
              [java.util.function Function]
              [com.google.gson Gson]))
+
+(comment
+
+  (+ 2 2)
+
+  comment)
 
 (gen-class
  :name MainActivity
@@ -26,8 +33,8 @@
 (def- state_atom (atom {:handlers []}))
 
 (defn activity_onResume [^MainActivity self]
-  (let [env_atom (nrepl/make_env)]
-    (nrepl/main 8090 env_atom)))
+  (let [env_atom (atom (i/make_env {}))]
+    (nrepl/main (fn [e l] (i/eval e l)) 8090 env_atom)))
 
 (defn- activity_onPause [^MainActivity self]
   (run!
