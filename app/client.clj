@@ -1,4 +1,5 @@
-(ns _ (:import [java.net ServerSocket Socket])
+(ns _ (:import [java.net ServerSocket Socket]
+               [java.nio ByteBuffer])
     (:require ["../interpreter/interpreter" :as i]))
 
 (defn make_env []
@@ -10,6 +11,8 @@
 
   (+ 2 2)
 
+  (str 1 2 3)
+
   comment)
 
 (defn- main_loop [env_atom ^ServerSocket server]
@@ -17,14 +20,18 @@
    (let [^Socket socket (recover (fn [] (.accept server)) (fn [] nil))]
      (if (some? socket)
        (let [in (.getInputStream socket)
-             input_bytes (.readAllBytes in)
+             len_buf (ByteBuffer/allocate 4)
+             _ (.read in (.array len_buf))
+             length (.getInt len_buf)
+             buffer (ByteBuffer/allocate length)
+             _ (.read in (.array buffer) 0 length)
+             input_bytes (.array buffer)
              lexems (vec (.split (String. input_bytes) "\\n"))
              [result env] (i/eval (deref env_atom) lexems)
              out (.getOutputStream socket)]
          (reset! env_atom env)
          (.write out (.getBytes (str result)))
          (.flush out)
-         (.shutdownOutput socket)
          (.close out)
          (.close socket)
          (main_loop env_atom server))))))
