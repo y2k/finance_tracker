@@ -1,7 +1,8 @@
 (ns _ (:import [org.junit Test]
-               [java.net Socket InetSocketAddress])
+               [java.net Socket InetSocketAddress]
+               [java.nio ByteBuffer])
     (:require ["../app/domain" :as d]
-              ["../app/client" :as c]
+              ["../nrepl/nrepl" :as nrepl]
               ["../interpreter/interpreter" :as i]))
 
 (gen-class :name Tests :extends Object :constructors {[] []} :prefix "_" :methods
@@ -19,13 +20,16 @@
 
 (defn- _eval_by_socket_executed [_]
   (checked!
-   (let [close_server (c/main 8090 (atom (i/make_env {})))
+   (let [close_server (nrepl/main (fn [e l] (i/eval e l)) 8090 (atom (i/make_env {})))
          socket (Socket.)]
      (.connect socket (InetSocketAddress. "localhost" 8090) 1000)
      (let [out (.getOutputStream socket)
-           in (.getInputStream socket)]
-       (.write out (.getBytes "(\n+\n2\n2\n)"))
-       (.shutdownOutput socket)
+           in (.getInputStream socket)
+           data (.getBytes "(\n+\n2\n2\n)")
+           len_buf (ByteBuffer/allocate 4)]
+       (.putInt len_buf (.-length data))
+       (.write out (.array len_buf))
+       (.write out data)
        (let [actual (String. (.readAllBytes in))]
          (close_server)
          (if (not= "4" actual)
