@@ -2,6 +2,16 @@
 
 ;; UI
 
+(comment
+
+  (+ 2 2)
+
+  (defn foo [a b] (+ a b))
+
+  (foo 1 2)
+
+  comment)
+
 (defn- button [{title :title onclick :onclick}]
   (str "<button onclick=\\\"Android.dispatch('" onclick "', '')\\\">" title "</button>"))
 

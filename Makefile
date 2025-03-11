@@ -8,6 +8,12 @@ test: clean build
 		-v ${PWD}/.github/android:/target \
 		y2khub/cljdroid test || open ".github/android/app/build/reports/tests/testDebugUnitTest/index.html"
 
+.PHONY: nrepl
+nrepl:
+	@ echo 8080 > .nrepl-port
+	@ adb forward tcp:18090 tcp:8090
+	@ clj2js nrepl -host 127.0.0.1
+
 .PHONY: build
 build: build_clj
 	@ docker run --rm \
