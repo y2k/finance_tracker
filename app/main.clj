@@ -1,21 +1,31 @@
-(ns _ (:require ["./repl_service" :as repl]
-                ["./database" :as db]
-                ["./message_broker" :as mb]
-                ["./webview" :as wv]
-                ["./domain" :as d]
-                ["../nrepl/nrepl" :as nrepl]
-                ["../interpreter/interpreter" :as i])
+(ns main (:require ["./repl_service" :as repl]
+                   ["./database" :as db]
+                   ["./message_broker" :as mb]
+                   ["./webview" :as wv]
+                   ["./domain" :as d]
+                   ["../nrepl/nrepl" :as nrepl]
+                   ["../interpreter/interpreter" :as i])
     (:import [android.app Activity]
              [android.content Intent]
              [android.net Uri]
              [android.os Bundle]
              [android.webkit WebView WebChromeClient ValueCallback JavascriptInterface]
              [java.util.function Function]
-             [com.google.gson Gson]))
+             [com.google.gson Gson]
+             [java.io File]))
 
 (comment
 
   (+ 2 2)
+
+  (defn foo [x] (+ 10 x))
+  (defn bar [x] x)
+
+  (mb/foo 2)
+
+  (+
+   (foo 1)
+   (bar 2))
 
   comment)
 
@@ -33,8 +43,12 @@
 (def- state_atom (atom {:handlers []}))
 
 (defn activity_onResume [^MainActivity self]
-  (let [env_atom (atom (i/make_env {}))]
-    (nrepl/main (fn [e l] (i/eval e l)) 8090 env_atom)))
+  (let [state_path (str (File. (.getFilesDir self) "state.txt"))
+        env_atom (atom (i/make_env {}))]
+    (nrepl/main (str state_path)
+                (fn [e l] (i/eval e l))
+                env_atom
+                {:port 8090})))
 
 (defn- activity_onPause [^MainActivity self]
   (run!
