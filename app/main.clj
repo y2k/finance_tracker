@@ -45,8 +45,7 @@
 (defn activity_onResume [^MainActivity self]
   (let [state_path (str (File. (.getFilesDir self) "state.txt"))
         env_atom (atom (i/make_env {}))]
-    (nrepl/main (str state_path)
-                (fn [e l] (i/eval e l))
+    (nrepl/main (fn [e l] (i/eval {} e l))
                 env_atom
                 {:port 8090})))
 

@@ -10,9 +10,9 @@
     (let [enc_code (.getString (.getExtras intent) "code")
           code (String. (Base64/decode enc_code 0))
           code_lines (Arrays/asList (.split code "\n"))]
-      (-> env
-          (i/eval code_lines)
-          second))
+      (->
+       (i/eval {} env code_lines)
+       second))
     env))
 
 (def env_atom (atom (i/make_env {})))

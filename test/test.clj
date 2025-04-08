@@ -20,7 +20,9 @@
 
 (defn- _eval_by_socket_executed [_]
   (checked!
-   (let [close_server (nrepl/main (fn [e l] (i/eval e l)) 8090 (atom (i/make_env {})))
+   (let [close_server (nrepl/main (fn [e l] (i/eval {:interpreter:save (fn [_ _] nil)} e l))
+                                  (atom (i/make_env {}))
+                                  {:port 8090})
          socket (Socket.)]
      (.connect socket (InetSocketAddress. "localhost" 8090) 1000)
      (let [out (.getOutputStream socket)
