@@ -15,7 +15,7 @@
     :root-ns "app"
     :src-dir "app"
     :target-dir ".github/android/app/src/main/java/app"
-    :items ["main" "effect" "database" "notifications" "repl_service" "message_broker" "webview" "domain"]})
+    :items ["main"]})
   (b/module
    {:lang "java"
     :root-ns "test"
@@ -28,4 +28,5 @@
     :items [{:name "interpreter" :version "0.4.0"}
             {:name "nrepl"       :version "0.2.0"}
             {:name "effects"     :version "0.2.0"}
-            {:name "socket"      :version "0.1.0"}]})])
+            {:name "socket"      :version "0.1.0"}
+            {:name "chat_ui"     :version "0.1.0"}]})])

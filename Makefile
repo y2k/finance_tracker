@@ -53,7 +53,11 @@ reload_file:
 		adb shell am start -n y2k.finance_tracker/app.main\\\$$MainActivity -f 0x20000000 --es "code" $$CODE
 
 .PHONY: run
-run: install hard_reload
+run: install am_start
+
+.PHONY: am_start
+am_start:
+	@ adb shell am start -S -n y2k.finance_tracker/app.main\\\$$MainActivity
 
 .PHONY: hard_reload
 hard_reload:
