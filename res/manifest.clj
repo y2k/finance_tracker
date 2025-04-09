@@ -10,6 +10,14 @@
                  :android:label "Finance Tracker"
                  :android:roundIcon "@drawable/ic_launcher"
                  :android:theme "@style/Theme.ChargeTimer"}
+   [:provider
+    {:android:name "androidx.core.content.FileProvider"
+     :android:authorities "y2k.finance_tracker.fileprovider"
+     :android:exported "false"
+     :android:grantUriPermissions "true"}
+    [:meta-data
+     {:android:name "android.support.FILE_PROVIDER_PATHS"
+      :android:resource "@xml/file_paths"}]]
    [:activity {:android:name "app.main$MainActivity"
                :android:configChanges "orientation|screenSize"
                :android:exported "true"

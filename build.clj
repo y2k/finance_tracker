@@ -25,8 +25,7 @@
   (b/vendor
    {:lang "java"
     :target-dir ".github/android/app/src/main/java"
-    :items [{:name "interpreter" :version "0.4.0"}
-            {:name "nrepl"       :version "0.2.0"}
-            {:name "effects"     :version "0.2.0"}
-            {:name "socket"      :version "0.1.0"}
-            {:name "chat_ui"     :version "0.1.0"}]})])
+    :items [{:name "effects"         :version "0.2.0"}
+            {:name "android_qr"      :version "0.1.0"}
+            {:name "android_gallery" :version "0.1.0"}
+            {:name "chat_ui"         :version "0.1.0"}]})])

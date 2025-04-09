@@ -47,6 +47,8 @@ dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
 
+    implementation("com.google.mlkit:barcode-scanning:17.2.0")
+
     testImplementation("junit:junit:4.13.2")
 
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
