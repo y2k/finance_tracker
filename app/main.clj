@@ -2,7 +2,8 @@
   (:require ["../chat_ui/chat_ui" :as ui]
             ["../effects/effects" :as e]
             ["../android_gallery/android_gallery" :as ag]
-            ["../android_qr/android_qr" :as qr])
+            ["../android_qr/android_qr" :as qr]
+            ["../android_db/android_db" :as db])
   (:import [android.app Activity]
            [android.content Intent]
            [android.net Uri]
@@ -36,6 +37,7 @@
     (ui/add_effect_handlers self root w_atom)
     (swap! w_atom (fn [w] (ag/attach_effect_handler self w)))
     (swap! w_atom (fn [w] (qr/attach_effect_handler self w)))
+    (swap! w_atom (fn [w] (db/attach_effect_handler {:db ":memory:"} w)))
     (execute_fx (main))))
 
 (defn- activity_onActivityResult [^MainActivity self ^int requestCode ^int resultCode ^Intent data]
@@ -45,7 +47,6 @@
 (gen-class
  :name MainActivity
  :extends Activity
- :constructors {[] []}
  :prefix "activity_"
  :methods [[^Override onCreate [Bundle] void]
            [^Override onActivityResult [int int Intent] void]])

@@ -6,11 +6,6 @@
     :rules [{:src "res/html.clj"     :target ".github/android/app/src/main/assets/index.html"}
             {:src "res/manifest.clj" :target ".github/android/app/src/main/AndroidManifest.xml"}]})
   (b/module
-   {:lang "js"
-    :src-dir "web"
-    :target-dir ".github/android/app/src/main/assets"
-    :items ["domain"]})
-  (b/module
    {:lang "java"
     :root-ns "app"
     :src-dir "app"
@@ -27,5 +22,6 @@
     :target-dir ".github/android/app/src/main/java"
     :items [{:name "effects"         :version "0.2.0"}
             {:name "android_qr"      :version "0.1.0"}
+            {:name "android_db"      :version "0.1.0"}
             {:name "android_gallery" :version "0.1.0"}
             {:name "chat_ui"         :version "0.1.0"}]})])

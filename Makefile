@@ -1,12 +1,16 @@
 OUT_DIR := .github/bin
 
 .PHONY: test
-test: clean build
-	@ docker run --rm \
-		-v ${PWD}/.github/temp/android:/root/.android \
-		-v ${PWD}/.github/temp/gradle:/root/.gradle \
-		-v ${PWD}/.github/android:/target \
-		y2khub/cljdroid test || open ".github/android/app/build/reports/tests/testDebugUnitTest/index.html"
+test: clean build_clj
+	@ cd .github/android && ./gradlew test
+
+# .PHONY: test
+# test: clean build
+# 	@ docker run --rm \
+# 		-v ${PWD}/.github/temp/android:/root/.android \
+# 		-v ${PWD}/.github/temp/gradle:/root/.gradle \
+# 		-v ${PWD}/.github/android:/target \
+# 		y2khub/cljdroid test || open ".github/android/app/build/reports/tests/testDebugUnitTest/index.html"
 
 .PHONY: nrepl
 nrepl:

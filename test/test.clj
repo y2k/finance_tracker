@@ -1,8 +1,11 @@
-(ns _ (:import [org.junit Test])
+(ns _ (:import [org.junit Test]
+               [org.junit.runner RunWith]
+               [org.robolectric RobolectricTestRunner])
     (:require ["../app/main" :as app]))
 
-(gen-class :name Tests :extends Object :constructors {[] []} :prefix "_" :methods
-           [[^Test test [] void]])
+(gen-class :name Tests
+           :annotations ["RunWith(RobolectricTestRunner.class)"]
+           :methods [[^Test test [] void]])
 
 (defn- assert_app [expected]
   (let [actual_atom (atom [])
