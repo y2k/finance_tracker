@@ -1,7 +1,7 @@
 (ns _ (:import [org.junit Test]
                [org.junit.runner RunWith]
                [org.robolectric RobolectricTestRunner])
-    (:require ["../app/main" :as app]))
+    (:require ["./main" :as app]))
 
 (gen-class :name Tests
            :annotations ["RunWith(RobolectricTestRunner.class)"]
@@ -13,7 +13,7 @@
                               [[:row {} (atom [])] nil])
                :chat_ui:button (fn [props]
                                  [[:button props] nil])
-               :chat_ui:add (fn [target child]
+               :chat_ui:add (fn [{target :parent child :child}]
                               (let [[_ _ children] target]
                                 (swap! children (fn [xs] (conj xs child)))
                                 [nil nil]))
@@ -24,6 +24,7 @@
       (FIXME "Test failed\nExpected: " expected "\nActual: " (deref actual_atom)))))
 
 (defn- _test [_]
-  (assert_app [[:update [:row {}
-                         [[:button {:onclick :lambda :title :QR}]
-                          [:button {:onclick :lambda :title :Settings}]]]]]))
+  (assert_app [[:update
+                [:row {}
+                 [[:button {:onclick :lambda1 :title :QR}]
+                  [:button {:onclick :lambda1 :title :Settings}]]]]]))

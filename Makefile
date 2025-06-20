@@ -4,13 +4,13 @@ OUT_DIR := .github/bin
 # test: clean build_clj
 # 	@ cd .github/android && ./gradlew test
 
-# # .PHONY: test
-# # test: clean build
-# # 	@ docker run --rm \
-# # 		-v ${PWD}/.github/temp/android:/root/.android \
-# # 		-v ${PWD}/.github/temp/gradle:/root/.gradle \
-# # 		-v ${PWD}/.github/android:/target \
-# # 		y2khub/cljdroid test || open ".github/android/app/build/reports/tests/testDebugUnitTest/index.html"
+.PHONY: test
+test: clean build_clj
+	@ docker run --rm \
+		-v ${PWD}/.github/temp/android:/root/.android \
+		-v ${PWD}/.github/temp/gradle:/root/.gradle \
+		-v ${PWD}/.github/android:/target \
+		y2khub/cljdroid test || open ".github/android/app/build/reports/tests/testDebugUnitTest/index.html"
 
 # .PHONY: nrepl
 # nrepl:
@@ -22,9 +22,7 @@ OUT_DIR := .github/bin
 build: build_clj build_java
 
 .PHONY: build_java
-build_java: build_clj
-	@ mkdir -p .github/android/app/src/main/java/y2k && \
-		cp ~/Projects/language/y2k/RT.java .github/android/app/src/main/java/y2k/RT.java
+build_java:
 	@ docker run --rm \
 		-v ${PWD}/.github/temp/android:/root/.android \
 		-v ${PWD}/.github/temp/gradle:/root/.gradle \
@@ -33,6 +31,8 @@ build_java: build_clj
 
 .PHONY: build_clj
 build_clj:
+	@ mkdir -p .github/android/app/src/main/java/y2k && \
+		cp ~/Projects/language/y2k/RT.java .github/android/app/src/main/java/y2k/RT.java
 	@ cd ~/Projects/language && dune build
 	@ export OCAMLRUNPARAM=b && \
 		~/Projects/language/_build/default/bin/main.exe compile -target eval -src build.clj > .github/Makefile && \
@@ -80,9 +80,10 @@ build_clj:
 .PHONY: clean
 clean:
 	@ rm -rf $(OUT_DIR)
-	@ rm -rf .github/android/app/src/main/assets/web
-	@ rm -rf .github/android/app/src/main/assets/index.html
+	@ rm -rf .github/android/app/src/androidTest/java
 	@ rm -rf .github/android/app/src/main/AndroidManifest.xml
+	@ rm -rf .github/android/app/src/main/assets/index.html
+	@ rm -rf .github/android/app/src/main/assets/web
 	@ rm -rf .github/android/app/src/main/java
 	@ rm -rf .github/android/app/src/test/java
 	@ rm -rf .github/Makefile

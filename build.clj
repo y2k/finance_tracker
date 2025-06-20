@@ -1,10 +1,15 @@
-(ns _ (:require ["vendor/make/0.3.0/main" :as b]))
+(ns _ (:require [".github/vendor/make/main" :as b]))
 
 (b/generate
  [{:target "java"
    :root "src"
-   :namespace "y2k.ft"
+   :namespace "app"
    :out-dir ".github/android/app/src/main/java/app"}
+  {:target "java"
+   :root "test"
+   :namespace "app"
+  ;;  :out-dir ".github/android/app/src/androidTest/java/app"
+   :out-dir ".github/android/app/src/test/java/app"}
   ;; (b/module-files
   ;;  {:target "repl"
   ;;   :rules [{:src "res/html.clj"     :target ".github/android/app/src/main/assets/index.html"}
