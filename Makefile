@@ -19,7 +19,12 @@ OUT_DIR := .github/bin
 # 	@ clj2js nrepl -host 127.0.0.1
 
 .PHONY: build
-build: build_clj
+build: build_clj build_java
+
+.PHONY: build_java
+build_java: build_clj
+	@ mkdir -p .github/android/app/src/main/java/y2k && \
+		cp ~/Projects/language/y2k/RT.java .github/android/app/src/main/java/y2k/RT.java
 	@ docker run --rm \
 		-v ${PWD}/.github/temp/android:/root/.android \
 		-v ${PWD}/.github/temp/gradle:/root/.gradle \
@@ -35,8 +40,6 @@ build_clj:
 	@ $(MAKE) -f .github/Makefile
 # @ mkdir -p .github/android/app/src/main/java/y2k && \
 # 	clj2js gen -target java > .github/android/app/src/main/java/y2k/RT.java
-	@ mkdir -p .github/android/app/src/main/java/y2k && \
-		cp ~/Projects/language/y2k/RT.java .github/android/app/src/main/java/y2k/RT.java
 
 # .PHONY: repl
 # repl:
