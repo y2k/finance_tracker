@@ -1,4 +1,4 @@
-(ns _ (:require ["../vendor/xml/0.2.0/main" :as xml]))
+(ns _ (:require ["../.github/vendor/xml/main" :as xml]))
 
 (xml/to_string
  [:manifest {:xmlns:android "http://schemas.android.com/apk/res/android"}
@@ -24,10 +24,4 @@
                :android:theme "@style/Theme.ChargeTimer"}
     [:intent-filter
      [:action {:android:name "android.intent.action.MAIN"}]
-     [:category {:android:name "android.intent.category.LAUNCHER"}]]]
-   [:service
-    {:android:name "y2k.finance_tracker.android.Notifications$NotificationListenerServiceImpl"
-     :android:exported "true"
-     :android:permission "android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"}
-    [:intent-filter
-     [:action {:android:name "android.service.notification.NotificationListenerService"}]]]]])
+     [:category {:android:name "android.intent.category.LAUNCHER"}]]]]])

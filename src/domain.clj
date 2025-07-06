@@ -10,9 +10,10 @@
                 (ui/update_ui [:label {:text (str x)}]))}))
 
 (defn main []
-  [:row {}
-   [:button {:title "QR"
-             :onclick (ag/get_image)}]
-   [:button {:title "Settings"
-             :onclick (ui/update_ui [:button {:title "TEST"
-                                              :onclick "nil"}])}]])
+  (ui/update_ui
+   [:row {}
+    [:button {:title "QR"
+              :onclick (ag/get_image)}]
+    [:button {:title "Settings"
+              :onclick (ui/update_ui [:button {:title "TEST"
+                                               :onclick "nil"}])}]]))

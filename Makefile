@@ -4,6 +4,9 @@ OUT_DIR := .github/bin
 # test: clean build_clj
 # 	@ cd .github/android && ./gradlew test
 
+.PHONY: all
+all: clean build_clj
+
 .PHONY: test
 test: clean build_clj
 	@ rm -f .github/android/app/build/reports/tests/testDebugUnitTest/index.html
@@ -32,12 +35,12 @@ build_java:
 
 .PHONY: build_clj
 build_clj:
+	@ rm -f .github/android/app/src/main/AndroidManifest.xml
 	@ mkdir -p .github/android/app/src/main/java/y2k && \
 		cp ~/Projects/language/y2k/RT.java .github/android/app/src/main/java/y2k/RT.java
 	@ cd ~/Projects/language && dune build
 	@ export OCAMLRUNPARAM=b && \
-		~/Projects/language/_build/default/bin/main.exe compile -target eval -src build.clj > .github/Makefile && \
-		~/Projects/language/_build/default/bin/main.exe compile -target eval -src res/manifest.clj > .github/android/app/src/main/AndroidManifest.xml
+		~/Projects/language/_build/default/bin/main.exe compile -target eval -src build.clj > .github/Makefile
 	@ $(MAKE) -f .github/Makefile
 # @ mkdir -p .github/android/app/src/main/java/y2k && \
 # 	clj2js gen -target java > .github/android/app/src/main/java/y2k/RT.java

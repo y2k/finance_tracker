@@ -1,7 +1,7 @@
 (ns _ (:import [org.junit Test]
                [org.junit.runner RunWith]
                [org.robolectric RobolectricTestRunner])
-    (:require ["./main" :as app]))
+    (:require ["./domain" :as app]))
 
 (gen-class :name Tests
            :annotations ["RunWith(RobolectricTestRunner.class)"]
