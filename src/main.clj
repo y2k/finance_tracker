@@ -29,8 +29,8 @@
     (ui/add_effect_handlers self root w_atom)
     (qr/attach_effect_handler self w_atom)
     (swap! w_atom (fn [w] (ag/attach_effect_handler self w)))
-    ((d/main) (deref w_atom))))
+    ((d/main {:name :home}) (deref w_atom))))
 
 (defn- activity_onActivityResult [^MainActivity self ^int requestCode ^int resultCode ^Intent data]
   (let [uri (ag/on_activity_result self requestCode resultCode data)]
-    ((d/get_image_callback uri) (deref (.-w_atom self)))))
+    ((d/main {:name :gallery :props {:url uri}}) (deref (.-w_atom self)))))

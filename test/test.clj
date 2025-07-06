@@ -5,9 +5,10 @@
 
 (gen-class :name Tests
            :annotations ["RunWith(RobolectricTestRunner.class)"]
-           :methods [[^Test test [] void]])
+           :methods [[^Test test [] void]
+                     [^Test test2 [] void]])
 
-(defn- assert_app [expected fx]
+(defn- assert_fx [expected fx]
   (let [actual_atom (atom [])
         world {:chat_ui:row (fn []
                               [[:row {} (atom [])] nil])
@@ -19,15 +20,24 @@
                                 [nil nil]))
                :chat_ui:update (fn [v]
                                  (swap! actual_atom (fn [xs] (conj xs [:update v])))
-                                 [nil nil])}]
+                                 [nil nil])
+               :android_qr:recognize (fn [props]
+                                       (swap! actual_atom (fn [xs] (conj xs [:recognize props])))
+                                       [nil nil])}]
+
     (fx world)
     (if (not= (str expected) (str (deref actual_atom)))
       (FIXME "Test failed\nExpected: " expected "\nActual: " (deref actual_atom)))))
 
 (defn- _test [_]
-  (assert_app
+  (assert_fx
    [[:update
      [:row {}
       [[:button {:onclick :lambda1 :title :QR}]
        [:button {:onclick :lambda1 :title :Settings}]]]]]
-   (app/main)))
+   (app/main {:name :home})))
+
+(defn- _test2 [_]
+  (assert_fx
+   [[:recognize {:url "some_url" :props {:callback :lambda1}}]]
+   (app/main {:name :gallery :props {:url "some_url"}})))
