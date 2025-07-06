@@ -6,6 +6,7 @@ OUT_DIR := .github/bin
 
 .PHONY: test
 test: clean build_clj
+	@ rm -f .github/android/app/build/reports/tests/testDebugUnitTest/index.html
 	@ docker run --rm \
 		-v ${PWD}/.github/temp/android:/root/.android \
 		-v ${PWD}/.github/temp/gradle:/root/.gradle \

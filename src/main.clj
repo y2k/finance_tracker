@@ -3,7 +3,8 @@
        ["./vendor/effects/effects" :as e]
        ["./vendor/android_gallery/android_gallery" :as ag]
        ["./vendor/android_qr/android_qr" :as qr]
-       ["./vendor/android_db/android_db" :as db])
+       ["./vendor/android_db/android_db" :as db]
+       ["./domain" :as d])
     (:import [android.app Activity]
              [android.content Intent]
              [android.view View]
@@ -11,16 +12,8 @@
              [android.os Bundle]
              [java.io File]))
 
-(defn- main_ui []
-  [:row {}
-   [:button {:title "QR"
-             :onclick (ag/get_image)}]
-   [:button {:title "Settings"
-             :onclick (ui/update_ui [:button {:title "TEST 2"
-                                              :onclick "nil"}])}]])
-
 (defn main []
-  (ui/update_ui (main_ui)))
+  (ui/update_ui (d/main)))
 
 (def- w_atom (atom {}))
 (defn- execute_fx [fx] (fx (deref w_atom)))
@@ -29,22 +22,14 @@
   (let [root (cast View (ui/root_ self))]
     (.setContentView self root)
     (ui/add_effect_handlers self root w_atom)
+    (qr/attach_effect_handler self w_atom)
     (swap! w_atom (fn [w] (ag/attach_effect_handler self w)))
-    (swap! w_atom (fn [w] (qr/attach_effect_handler self w)))
     ;; (swap! w_atom (fn [w] (db/attach_effect_handler {:db ":memory:"} w)))
     (execute_fx (main))))
 
-;;
-
-(defn main_event [uri]
-  (qr/decode_qr
-   uri
-   {:callback (fn [[x]]
-                (execute_fx (ui/update_ui [:label {:text (str x)}])))}))
-
 (defn- activity_onActivityResult [^MainActivity self ^int requestCode ^int resultCode ^Intent data]
   (let [uri (ag/on_activity_result self requestCode resultCode data)]
-    (execute_fx (main_event uri))))
+    (execute_fx (d/get_image_callback uri))))
 
 ;;
 
