@@ -5,8 +5,8 @@
 
 (gen-class :name Tests
            :annotations ["RunWith(RobolectricTestRunner.class)"]
-           :methods [[^Test test [] void]
-                     [^Test test2 [] void]])
+           :methods [[^Test test_home [] void]
+                     [^Test test_gallery [] void]])
 
 (defn- assert_fx [expected fx]
   (let [actual_atom (atom [])
@@ -29,7 +29,7 @@
     (if (not= (str expected) (str (deref actual_atom)))
       (FIXME "Test failed\nExpected: " expected "\nActual: " (deref actual_atom)))))
 
-(defn- _test [_]
+(defn- _test_home [_]
   (assert_fx
    [[:update
      [:row {}
@@ -37,7 +37,7 @@
        [:button {:onclick :lambda1 :title :Settings}]]]]]
    (app/main {:name :home})))
 
-(defn- _test2 [_]
+(defn- _test_gallery [_]
   (assert_fx
    [[:recognize {:url "some_url" :props {:callback :lambda1}}]]
    (app/main {:name :gallery :props {:url "some_url"}})))
